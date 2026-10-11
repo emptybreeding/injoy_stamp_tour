@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>IN:JOY 운영 현황</title>
+<style>
+@font-face{font-family:'Ssurround';src:url('assets/Cafe24Ssurround.woff2') format('woff2');font-display:swap;unicode-range:U+0000-00D6,U+00D8-2038,U+203B-218F,U+2193-25B5,U+25B7-FFFF}
+:root{--yellow:#FFEE00;--navy:#1F4A86;--ink:#22325A;--pink:#F27BA6;--blue:#5BB8EE;--orange:#F7941D;--green:#8DC63F;--muted:#6b7590}
+*{box-sizing:border-box}
+body{margin:0;background:#FFF9C9;color:var(--ink);font-family:'Ssurround','Apple SD Gothic Neo','Malgun Gothic',sans-serif}
+header{background:var(--yellow);border-bottom:3px solid var(--ink);padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header img{height:30px}
+header h1{margin:0;font-size:20px;color:var(--navy);flex:1;min-width:200px}
+.mode{font-size:12px;border-radius:999px;padding:5px 10px;border:2px solid var(--ink);background:#fff}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.kpi{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:14px 16px;box-shadow:4px 5px 0 var(--c,var(--pink))}
+.kpi .l{font-size:13px;color:var(--muted)}
+.kpi .v{font-size:34px;color:var(--navy);margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:var(--muted);margin-top:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:18px}
+.panel{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:16px 18px}
+.panel h2{margin:0 0 12px;font-size:16px;color:var(--navy)}
+.panel h2 small{font-size:12px;color:var(--muted);margin-left:6px}
+.bar{display:grid;grid-template-columns:118px 1fr 64px;align-items:center;gap:10px;margin:7px 0;font-size:13px}
+.bar .t{color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .track{height:16px;background:#EEF1F6;border-radius:999px;overflow:hidden}
+.bar .fill{height:100%;border-radius:999px;background:var(--c,var(--blue))}
+.bar .n{text-align:right;color:var(--ink);font-variant-numeric:tabular-nums;font-size:12.5px}
+.bar .n small{color:var(--muted)}
+.big{font-size:28px;color:var(--navy)}
+.cmts{max-height:320px;overflow:auto;display:grid;gap:8px}
+.cmt{background:#FFF6C2;border-radius:12px;padding:9px 12px;font-size:13.5px;line-height:1.45}
+.cmt b{font-weight:normal;color:var(--muted);font-size:11.5px;display:block}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button{font-family:inherit;font-size:14px;border:2.5px solid var(--ink);border-radius:12px;padding:10px 14px;background:#fff;color:var(--navy);cursor:pointer;box-shadow:0 3px 0 var(--ink)}
+button.primary{background:var(--blue);color:#fff}
+.login{max-width:360px;margin:60px auto;background:#fff;border:3px solid var(--ink);border-radius:20px;padding:24px}
+.login input{width:100%;height:46px;border-radius:12px;border:2.5px solid var(--ink);padding:0 12px;font-size:15px;margin-top:10px;font-family:inherit}
+.note{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+.err{color:#E2457A;font-size:13px;margin-top:8px;min-height:18px}
+.prepost{display:flex;gap:16px;align-items:flex-end;margin-top:6px}
+.prepost div{flex:1;text-align:center}
+.prepost .lbl{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header><img src="assets/logos.webp" alt=""><h1>IN:JOY 스탬프 투어 · 운영 현황</h1><span class="mode" id="mode">로컬 모드</span></header>
+<main id="main"></main>
+<script type="module">
+/* index.html 과 같은 Firebase 설정을 넣어주세요 (README 참고) */
+const FIREBASE = null;
+const GOAL = 4;
+const BOOTHS=[['b1','볼꾸 힐링타임','#F27BA6'],['b2','거북이 키링','#2FA58F'],['b3','농구왕 도전','#F7941D'],['b4','꿈꾸는 쿠키공방','#C98A4B'],['b5','AI 마음자판기','#5BB8EE'],['b6','아로마 롤온','#9B7FD6'],['b7','잠시 멈춤 OFF','#1F4A86']];
+const BN=Object.fromEntries(BOOTHS.map(b=>[b[0],b[1]]));
+const Q=[
+ ['overall','전반 만족도','face',['1','2','3','4','5'],{1:'별로',2:'그냥',3:'보통',4:'좋아',5:'최고'}],
+ ['best','가장 재밌었던 체험','booth',BOOTHS.map(b=>b[0])],
+ ['before','축제 전 스트레스','gauge',['5','4','3','2','1'],{5:'꽉 참',4:'많음',3:'보통',2:'조금',1:'거의 없음'}],
+ ['after','축제 후 스트레스','gauge',['5','4','3','2','1'],{5:'꽉 참',4:'많음',3:'보통',2:'조금',1:'거의 없음'}],
+ ['again','재참여 의향','pick',['무조건 와!','아마 올 듯','글쎄…','잘 모르겠어']],
+ ['channel','인지 경로','pick',['학교 안내','청소년센터','SNS','친구·가족','지나가다 우연히','기타']],
+ ['grade','학교급','pick',['초등학생','중학생','고등학생','그 외']],
+];
+const $=s=>document.querySelector(s); const main=$('#main');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let rows=[];
+
+function bars(items,total,color){ const max=Math.max(1,...items.map(i=>i[1]));
+  return items.map(([t,n,c])=>`<div class="bar"><span class="t" title="${esc(t)}">${esc(t)}</span><div class="track"><div class="fill" style="width:${n/max*100}%;--c:${c||color}"></div></div><span class="n">${n} <small>${total?Math.round(n/total*100):0}%</small></span></div>`).join(''); }
+const avg=a=>a.length?(a.reduce((x,y)=>x+y,0)/a.length):0;
+
+function render(){
+  const P=rows.length, elig=rows.filter(r=>(r.stampCount||0)>=GOAL).length, sv=rows.filter(r=>r.surveyDone).length,
+    iss=rows.filter(r=>r.voucherCode).length, red=rows.filter(r=>r.redeemedAt).length;
+  const S=rows.filter(r=>r.survey).map(r=>r.survey);
+  const booth=BOOTHS.map(([id,n,c])=>[n,rows.filter(r=>r.stamps&&r.stamps[id]).length,c]);
+  const dist=[0,1,2,3,4,5,6,7].map(k=>[k+'개',rows.filter(r=>(r.stampCount||0)===k).length,k>=GOAL?'#8DC63F':'#ACDBF5']);
+  const pre=S.map(s=>+s.before).filter(Boolean), post=S.map(s=>+s.after).filter(Boolean);
+  const drop=avg(pre)?((avg(pre)-avg(post))/avg(pre)*100):0;
+  const ov=S.map(s=>+s.overall).filter(Boolean);
+  const qPanels=Q.map(([id,label,type,opts,lab])=>{
+    const vals=S.map(s=>s[id]).filter(v=>v!==undefined&&v!=='');
+    const items=opts.map(o=>[type==='booth'?BN[o]:(lab?lab[o]:o),vals.filter(v=>String(v)===String(o)).length]);
+    const extra=type==='face'?`<span class="big" style="float:right">${avg(ov).toFixed(2)}<small style="font-size:13px;color:var(--muted)"> / 5</small></span>`:'';
+    return `<div class="panel"><h2>${label}<small>응답 ${vals.length}</small>${extra}</h2>${bars(items,vals.length,'#F27BA6')}</div>`;
+  }).join('');
+  const cm=rows.filter(r=>r.survey&&r.survey.comment).sort((a,b)=>(b.surveyAt||0)-(a.surveyAt||0));
+  main.innerHTML=`
+  <div class="kpis">
+    <div class="kpi" style="--c:var(--blue)"><div class="l">참여자</div><div class="v">${P}</div><div class="s">닉네임 등록 기준</div></div>
+    <div class="kpi" style="--c:var(--orange)"><div class="l">총 스탬프</div><div class="v">${rows.reduce((a,r)=>a+(r.stampCount||0),0)}</div><div class="s">1인 평균 ${P?(rows.reduce((a,r)=>a+(r.stampCount||0),0)/P).toFixed(1):0}개</div></div>
+    <div class="kpi" style="--c:var(--green)"><div class="l">${GOAL}개 달성</div><div class="v">${elig}</div><div class="s">참여자의 ${P?Math.round(elig/P*100):0}%</div></div>
+    <div class="kpi" style="--c:var(--pink)"><div class="l">설문 완료 · 교환권 발급</div><div class="v">${sv}</div><div class="s">발급 ${iss}</div></div>
+    <div class="kpi" style="--c:#9B7FD6"><div class="l">운영본부 교환 완료</div><div class="v">${red}</div><div class="s">미교환 ${Math.max(0,iss-red)}</div></div>
+  </div>
+  <div class="grid">
+    <div class="panel"><h2>부스별 인증 수</h2>${bars(booth,P,'#5BB8EE')}</div>
+    <div class="panel"><h2>1인당 스탬프 개수 분포</h2>${bars(dist,P)}</div>
+    <div class="panel"><h2>스트레스 변화 <small>설문 응답자 기준 · 5점 척도(높을수록 스트레스↑)</small></h2>
+      <div class="prepost"><div><div class="lbl">축제 전</div><div class="big">${avg(pre).toFixed(2)}</div></div><div style="flex:0;font-size:24px;padding-bottom:4px">→</div><div><div class="lbl">축제 후</div><div class="big">${avg(post).toFixed(2)}</div></div>
+      <div><div class="lbl">감소율</div><div class="big" style="color:#2FA58F">${drop>0?'▼ '+drop.toFixed(1)+'%':'-'}</div></div></div>
+      <p class="note">결과보고서용 성과지표: "참여 후 스트레스 지수 ${drop>0?drop.toFixed(1)+'% 감소':'(데이터 수집 중)'}"</p></div>
+    ${qPanels}
+    <div class="panel"><h2>한마디 <small>${cm.length}건</small></h2><div class="cmts">${cm.map(r=>`<div class="cmt"><b>${esc(r.nick)} · ${r.surveyAt?new Date(r.surveyAt).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):''}</b>${esc(r.survey.comment)}</div>`).join('')||'<p class="note">아직 없어요</p>'}</div></div>
+  </div>
+  <div class="tools"><button class="primary" id="csv">CSV 다운로드 (엑셀용)</button>${FIREBASE?'':'<button id="demo">데모 데이터 보기</button><button id="clear">데모 지우기</button>'}</div>
+  <p class="note">마지막 갱신 ${new Date().toLocaleTimeString('ko-KR')} ${FIREBASE?'· 실시간 자동 갱신 중':'· 로컬 모드: Firebase 설정 전에는 이 기기에서 참여한 기록과 데모 데이터만 보여요.'}</p>`;
+  $('#csv').onclick=csv;
+  if(!FIREBASE){ $('#demo').onclick=()=>{rows=demo(140);render();}; $('#clear').onclick=()=>{rows=localRows();render();}; }
+}
+function csv(){
+  const head=['id','닉네임','스탬프수',...BOOTHS.map(b=>b[1]),...Q.map(q=>q[1]),'한마디','교환권번호','발급','교환'];
+  const t=v=>v?new Date(v).toLocaleString('ko-KR'):'';
+  const lines=[head,...rows.map(r=>{ const s=r.survey||{}; return [r.id,r.nick,r.stampCount||0,...BOOTHS.map(b=>r.stamps&&r.stamps[b[0]]?t(r.stamps[b[0]]):''),
+    ...Q.map(([id,,type,,lab])=>type==='booth'?(BN[s[id]]||''):(lab&&s[id]?lab[s[id]]:(s[id]??''))),s.comment||'',r.voucherCode||'',t(r.issuedAt),t(r.redeemedAt)]; })];
+  const body='﻿'+lines.map(l=>l.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([body],{type:'text/csv'})); a.download='injoy_stamp_tour.csv'; a.click();
+}
+function localRows(){ try{ const v=JSON.parse(localStorage.getItem('injoy2026_v1')); if(v&&v.id) return [{...v,stampCount:Object.keys(v.stamps||{}).length,voucherCode:v.voucher?.code,issuedAt:v.voucher?.issuedAt,redeemedAt:v.voucher?.redeemedAt}]; }catch(e){} return []; }
+function demo(n){
+  const r=[],pick=a=>a[Math.floor(Math.random()*a.length)],names=['하늘','별빛','민트초코','농구왕','쿠키몬','IN조이','강남러','토끼','고양이','도레미'];
+  for(let i=0;i<n;i++){ const k=Math.min(7,Math.max(0,Math.round(2+Math.random()*4+(Math.random()<.2?-2:0))));
+    const ids=[...BOOTHS].sort(()=>Math.random()-.5).slice(0,k).map(b=>b[0]); const stamps={}; ids.forEach(id=>stamps[id]=Date.now()-Math.random()*5e6);
+    const o={id:'demo'+i,nick:pick(names)+i,stamps,stampCount:k};
+    if(k>=GOAL&&Math.random()<.9){ const b=3+Math.floor(Math.random()*3); o.surveyDone=true; o.surveyAt=Date.now()-Math.random()*3e6;
+      o.survey={overall:pick([3,4,4,5,5,5]),best:pick(ids),before:b,after:Math.max(1,b-1-Math.floor(Math.random()*2)),again:pick(['무조건 와!','무조건 와!','아마 올 듯','글쎄…']),channel:pick(['학교 안내','청소년센터','SNS','친구·가족','지나가다 우연히']),grade:pick(['초등학생','중학생','중학생','고등학생']),comment:Math.random()<.3?pick(['쿠키 너무 맛있어요!','농구 또 하고 싶어요','내년에도 해주세요','줄이 좀 길었어요','AI 자판기 신기했어요']):''};
+      o.voucherCode='IJ-'+(1000+i); o.issuedAt=o.surveyAt; if(Math.random()<.85) o.redeemedAt=o.surveyAt+6e5; }
+    r.push(o); }
+  return r;
+}
+
+async function boot(){
+  if(!FIREBASE){ rows=localRows(); render(); return; }
+  $('#mode').textContent='Firebase 실시간';
+  const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+  const AU=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+  const F=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+  const app=A.initializeApp(FIREBASE), auth=AU.getAuth(app), db=F.getFirestore(app);
+  AU.onAuthStateChanged(auth,u=>{
+    if(!u){ main.innerHTML=`<div class="login"><h2 style="margin:0;color:var(--navy)">운영자 로그인</h2><input id="em" type="email" placeholder="이메일"><input id="pw" type="password" placeholder="비밀번호"><div class="err" id="er"></div><button class="primary" id="lg" style="width:100%;margin-top:6px">로그인</button><p class="note">Firebase 콘솔 > Authentication에서 만든 운영자 계정으로 로그인하세요.</p></div>`;
+      $('#lg').onclick=()=>AU.signInWithEmailAndPassword(auth,$('#em').value,$('#pw').value).catch(e=>$('#er').textContent='로그인 실패: '+e.code); return; }
+    F.onSnapshot(F.collection(db,'participants'),snap=>{ rows=snap.docs.map(d=>({id:d.id,...d.data()})); render(); });
+  });
+}
+boot();
+</script>
+</body>
+</html>

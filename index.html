@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#FFEE00">
+<title>IN:JOY 스탬프 투어</title>
+<style>
+@font-face{font-family:'Ssurround';src:url('assets/Cafe24Ssurround.woff2') format('woff2');font-display:swap;unicode-range:U+0000-00D6,U+00D8-2038,U+203B-218F,U+2193-25B5,U+25B7-FFFF}
+:root{
+  --yellow:#FFEE00; --yellow-2:#F3DD00; --navy:#1F4A86; --ink:#22325A;
+  --blue:#5BB8EE; --sky:#ACDBF5; --pink:#F27BA6; --pink-l:#FAC6D8; --orange:#F7941D;
+  --green:#8DC63F; --teal:#2FA58F; --white:#fff; --gray:#E6E6E6;
+  --out-w: 0 0 0 #fff;
+  --font:'Ssurround','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--yellow);color:var(--ink);font-family:var(--font);overscroll-behavior:none;-webkit-font-smoothing:antialiased;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='22'%3E%3Cpath d='M0 11 Q10 5 20 11 T40 11 T60 11 T80 11' fill='none' stroke='%23F7E200' stroke-width='1.8'/%3E%3C/svg%3E")}
+body.pink{background-color:#F9C6D7;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='22'%3E%3Cpath d='M0 11 Q10 5 20 11 T40 11 T60 11 T80 11' fill='none' stroke='%23F3B5C9' stroke-width='2'/%3E%3C/svg%3E")}
+body.sky{background-color:#ACDBF5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='22'%3E%3Cpath d='M0 11 Q10 5 20 11 T40 11 T60 11 T80 11' fill='none' stroke='%239DCFEC' stroke-width='2'/%3E%3C/svg%3E")}
+button,input{font-family:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+#app{max-width:480px;margin:0 auto;min-height:100%;position:relative;overflow-x:hidden;padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+img{display:block;max-width:100%}
+
+/* ===== type ===== */
+.out{color:var(--navy);text-shadow:
+ 3px 0 #fff,-3px 0 #fff,0 3px #fff,0 -3px #fff,2px 2px #fff,-2px 2px #fff,2px -2px #fff,-2px -2px #fff,
+ 5px 0 #fff,-5px 0 #fff,0 5px #fff,0 -5px #fff,4px 4px #fff,-4px 4px #fff,4px -4px #fff,-4px -4px #fff,0 8px 0 rgba(34,50,90,.12)}
+.out-g{color:var(--green);text-shadow:
+ 2px 0 var(--ink),-2px 0 var(--ink),0 2px var(--ink),0 -2px var(--ink),1.5px 1.5px var(--ink),-1.5px 1.5px var(--ink),1.5px -1.5px var(--ink),-1.5px -1.5px var(--ink),
+ 5px 0 #fff,-5px 0 #fff,0 5px #fff,0 -5px #fff,4px 4px #fff,-4px 4px #fff,4px -4px #fff,-4px -4px #fff}
+.tiny{font-size:12px;line-height:1.5;color:#3d4a6b}
+
+/* ===== header ===== */
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 0}
+.topbar .logos{width:176px}
+.icon-btn{width:38px;height:38px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);display:grid;place-items:center;box-shadow:0 3px 0 var(--ink)}
+.icon-btn svg{width:20px;height:20px}
+
+/* ===== intro ===== */
+.intro{padding:6px 16px 0;text-align:center;position:relative}
+.bubble{position:relative;margin:18px auto 6px;width:88%;background:var(--pink);border:3px solid var(--ink);padding:16px 10px 18px;
+  clip-path:polygon(4% 14%,30% 0,68% 6%,100% 2%,96% 70%,100% 100%,40% 92%,14% 100%,0 66%);
+  font-size:27px;line-height:1.25;transform:rotate(-2deg)}
+.bubble-wrap{filter:drop-shadow(0 0 0 #fff) drop-shadow(4px 4px 0 #fff) drop-shadow(-4px -4px 0 #fff) drop-shadow(4px -4px 0 #fff) drop-shadow(-4px 4px 0 #fff)}
+.bubble::after{content:"";position:absolute;inset:0;background-image:radial-gradient(#ED5E92 1.2px,transparent 1.4px);background-size:14px 18px;opacity:.6;pointer-events:none}
+.bubble span{position:relative;z-index:1}
+.title-img{width:92%;margin:4px auto 0;animation:bob 3.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-.6deg)}}
+.date-line{font-size:17px;color:var(--navy);margin:10px 0 2px}
+.balloon{position:absolute;pointer-events:none;animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+.card{background:#fff;border:3px solid var(--ink);border-radius:22px;position:relative}
+.card.shadow-pink{box-shadow:6px 7px 0 var(--pink)}
+.card.shadow-blue{box-shadow:6px 7px 0 var(--blue)}
+.card.shadow-orange{box-shadow:6px 7px 0 var(--orange)}
+.tape{position:absolute;width:86px;height:24px;opacity:.95;top:-13px;left:50%;transform:translateX(-50%) rotate(-3deg);
+  background:repeating-linear-gradient(90deg,#8FC7EE 0 6px,#fff 6px 7px),#8FC7EE;border-radius:2px}
+.tape.grid{background-color:#fff;background-image:linear-gradient(#8FB9E6 1px,transparent 1px),linear-gradient(90deg,#8FB9E6 1px,transparent 1px);background-size:8px 8px}
+.tape.dots{background-color:#7DB9EE;background-image:radial-gradient(#fff 2.6px,transparent 3px);background-size:14px 12px}
+.tape.green{background:repeating-linear-gradient(-45deg,#8DC63F 0 5px,#9BD14E 5px 10px)}
+.tape.pink{background:repeating-linear-gradient(-45deg,#F7A2C2 0 5px,#F9B6CF 5px 10px)}
+.tape.stripe{background:repeating-linear-gradient(-45deg,#FFD43B 0 6px,#FFE780 6px 12px)}
+.join{margin:26px 4px 0;padding:24px 18px 20px;text-align:left}
+.join h3{margin:0 0 4px;font-size:20px;color:var(--navy)}
+.field{display:flex;gap:8px;margin-top:12px}
+.field input{flex:1;min-width:0;height:54px;border-radius:16px;border:3px solid var(--ink);padding:0 16px;font-size:19px;background:#FFFBE0;outline:none}
+.field input:focus{background:#fff;box-shadow:0 0 0 4px rgba(91,184,238,.45)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:58px;border-radius:18px;border:3px solid var(--ink);font-size:20px;
+  background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--ink);transition:transform .08s,box-shadow .08s;width:100%;
+  text-shadow:0 2px 0 rgba(34,50,90,.35)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.btn.pink{background:var(--pink)}.btn.orange{background:var(--orange)}.btn.green{background:var(--green)}
+.btn.white{background:#fff;color:var(--navy);text-shadow:none}
+.btn[disabled]{filter:grayscale(.7);opacity:.6}
+.how{margin:22px 4px 0;padding:22px 16px 16px}
+.how ol{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:10px}
+.how li{display:flex;gap:12px;align-items:center;font-size:15.5px;line-height:1.35;color:var(--navy)}
+.how .n{flex:0 0 34px;height:34px;border-radius:50%;border:2.5px solid var(--ink);display:grid;place-items:center;font-size:16px;color:#fff;background:var(--pink)}
+.how li:nth-child(2) .n{background:var(--orange)}.how li:nth-child(3) .n{background:var(--blue)}.how li:nth-child(4) .n{background:var(--green)}
+.chars{display:flex;justify-content:space-between;align-items:flex-end;margin:20px -16px 0;overflow:hidden}
+.chars img{height:96px;width:auto}
+
+/* ===== home ===== */
+.hello{padding:10px 16px 0;text-align:center}
+.hello .nick{font-size:15px;color:var(--navy);background:#fff;border:2.5px solid var(--ink);border-radius:999px;display:inline-block;padding:7px 14px;margin-top:4px}
+.hello h1{margin:12px 0 0;font-size:30px;line-height:1.2}
+.meter{margin:22px 16px 0;padding:18px 16px 16px}
+.meter .row{display:flex;align-items:center;justify-content:space-between}
+.meter .label{font-size:15px;color:var(--navy)}
+.meter .count{font-size:30px;color:var(--navy)}
+.meter .count small{font-size:16px;color:#6b7590}
+.switch{margin-top:12px;height:56px;border-radius:999px;border:3px solid var(--ink);background:#E9EEF6;position:relative;overflow:hidden}
+.switch .fill{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--pink),var(--orange));transition:width .9s cubic-bezier(.3,1.5,.5,1);border-right:3px solid var(--ink)}
+.switch .seg{position:absolute;top:0;bottom:0;width:3px;background:rgba(34,50,90,.18)}
+.switch .tag{position:absolute;top:50%;transform:translateY(-50%);font-size:16px;z-index:2}
+.switch .tag.off{left:16px;color:#6b7590}.switch .tag.on{right:16px;color:var(--navy)}
+.switch.full .fill{background:linear-gradient(90deg,var(--green),#5FC4A0)}
+.switch.full .tag.off{color:#fff;text-shadow:0 1px 0 var(--ink)}
+.meter .msg{margin-top:12px;font-size:14.5px;color:var(--navy);text-align:center;line-height:1.4}
+.sec-title{display:flex;align-items:center;justify-content:center;margin:30px 0 4px}
+.sec-title span{background:#fff;border:3px solid var(--ink);border-radius:999px;padding:9px 22px;font-size:18px;color:var(--navy);box-shadow:0 4px 0 var(--ink)}
+.sec-sub{text-align:center;font-size:13.5px;color:var(--navy);margin:12px 0 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 14px;padding:18px 16px 0}
+.booth{background:#fff;border:3px solid var(--ink);border-radius:20px;padding:14px 10px 12px;text-align:center;position:relative;min-height:176px;
+  display:flex;flex-direction:column;align-items:center;box-shadow:5px 6px 0 var(--c);transition:transform .1s}
+.booth:active{transform:scale(.96)}
+.booth .ico{width:62px;height:62px;border-radius:50%;background:var(--cl);border:2.5px solid var(--ink);display:grid;place-items:center}
+.booth .ico svg{width:46px;height:46px}
+.booth .host{margin-top:8px;font-size:11.5px;background:var(--cl);border-radius:999px;padding:3px 9px;color:var(--navy)}
+.booth .name{margin-top:6px;font-size:15.5px;line-height:1.28;color:var(--navy);word-break:keep-all}
+.booth .go{margin-top:auto;padding-top:8px;font-size:13px;color:var(--c-d)}
+.booth.done .ico,.booth.done .name,.booth.done .host{opacity:.35}
+.booth .stamp{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.booth.wide{grid-column:1/-1;flex-direction:row;min-height:0;text-align:left;gap:12px;padding:12px 14px}
+.booth.wide .txt{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.booth.wide .host{margin-top:0}
+.booth.wide .go{margin:0 0 0 auto;padding:0}
+.stampmark{width:116px;height:116px;border-radius:50%;border:5px solid var(--c);color:var(--c);display:grid;place-items:center;transform:rotate(-14deg);
+  background:radial-gradient(circle,rgba(255,255,255,.85) 58%,transparent 60%);position:relative}
+.stampmark::before{content:"";position:absolute;inset:6px;border-radius:50%;border:2px dashed var(--c)}
+.stampmark b{font-size:22px;letter-spacing:1px;line-height:1}
+.stampmark i{display:block;font-style:normal;font-size:11px;margin-top:3px;text-align:center}
+.booth.wide .stampmark{width:84px;height:84px}.booth.wide .stampmark b{font-size:17px}
+.booth.wide .stamp{justify-content:end;padding-right:18px}
+.info{margin:30px 16px 0;padding:20px 16px 16px}
+.info dl{margin:6px 0 0;display:grid;grid-template-columns:auto 1fr;gap:9px 12px;font-size:14px;line-height:1.4}
+.info dt{color:#fff;background:var(--navy);border-radius:8px;padding:3px 8px;height:fit-content;font-size:12.5px;text-align:center}
+.info dd{margin:0;color:var(--navy)}
+.foot{text-align:center;margin:26px 16px 0}
+.foot .logos{width:200px;margin:0 auto}
+.foot .tiny{margin-top:10px}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:12px 16px calc(14px + env(safe-area-inset-bottom));
+  background:linear-gradient(rgba(255,238,0,0),#FFEE00 26px);max-width:480px;margin:0 auto}
+.dock .btn{height:62px;font-size:20px}
+.pulse{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.dock .hint{width:fit-content;margin:0 auto 8px;background:#fff;border:2px solid var(--ink);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--navy)}
+
+/* ===== sheet / modal ===== */
+.scrim{position:fixed;inset:0;background:rgba(20,30,60,.55);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.scrim.center{align-items:center;padding:16px}
+@keyframes fade{from{opacity:0}}
+.still{animation:none!important}
+.sheet{width:100%;max-width:480px;background:#fff;border:3px solid var(--ink);border-bottom:0;border-radius:28px 28px 0 0;
+  padding:0 0 calc(22px + env(safe-area-inset-bottom));animation:up .35s cubic-bezier(.2,1.3,.4,1);max-height:94vh;overflow:auto}
+@keyframes up{from{transform:translateY(100%)}}
+.sheet .head{background:var(--cl);border-bottom:3px solid var(--ink);padding:20px 18px 16px;border-radius:25px 25px 0 0;position:relative;text-align:center}
+.sheet .head .ico{width:70px;height:70px;margin:0 auto;border-radius:50%;background:#fff;border:2.5px solid var(--ink);display:grid;place-items:center}
+.sheet .head .ico svg{width:52px;height:52px}
+.sheet .head .sub{font-size:14px;color:var(--navy);margin-top:10px}
+.sheet .head h2{margin:4px 0 0;font-size:22px;color:var(--navy);line-height:1.25;word-break:keep-all}
+.sheet .x{position:absolute;right:12px;top:12px}
+.quiz{padding:20px 18px 0;text-align:center}
+.quiz .q{font-size:15px;color:#4a5778;line-height:1.45}
+.quiz .q b{color:var(--navy);font-weight:normal}
+.sentence{margin:16px 0 0;font-size:24px;color:var(--navy);line-height:1.9;word-break:keep-all;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px}
+.slot{display:inline-grid;place-items:center;min-width:48px;height:52px;padding:0 8px;border:3px dashed var(--c);border-radius:12px;background:#FFFBE0;font-size:24px;color:var(--navy);vertical-align:middle}
+.slot.filled{border-style:solid;background:var(--cl);animation:pop .25s}
+@keyframes pop{50%{transform:scale(1.18)}}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0 0}
+.tiles.wide{grid-template-columns:1fr 1fr}
+.tile{height:58px;border-radius:16px;border:3px solid var(--ink);background:#fff;font-size:22px;color:var(--navy);box-shadow:0 4px 0 var(--ink);transition:transform .08s}
+.tile:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.tile.used{opacity:.25;pointer-events:none}
+.quiz .row2{display:flex;gap:10px;margin-top:16px}
+.quiz .row2 .btn{height:50px;font-size:16px}
+.hintbox{margin:18px 0 0;background:#FFF6C2;border:2px dashed #E3C200;border-radius:14px;padding:10px 12px;font-size:13px;color:var(--navy);line-height:1.45;text-align:left;display:flex;gap:8px}
+.shake{animation:shake .45s}
+@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+.feedback{height:26px;margin-top:12px;font-size:17px}
+.feedback.no{color:#E2457A}.feedback.ok{color:var(--teal)}
+.modal{width:100%;max-width:400px;background:#fff;border:3px solid var(--ink);border-radius:28px;padding:30px 20px 22px;text-align:center;position:relative;animation:zoom .45s cubic-bezier(.2,1.5,.4,1)}
+@keyframes zoom{from{transform:scale(.5);opacity:0}}
+.modal h2{margin:12px 0 0;font-size:26px;line-height:1.3}
+.modal p{margin:12px 0 0;font-size:15px;line-height:1.55;color:var(--navy);word-break:keep-all}
+.modal .btns{display:grid;gap:12px;margin-top:22px}
+.modal .burst{width:120px;height:120px;margin:-6px auto 0}
+
+/* big stamp overlay */
+.bigstamp{position:fixed;inset:0;z-index:80;display:grid;place-items:center;pointer-events:none}
+.bigstamp .stampmark{width:230px;height:230px;border-width:9px;animation:slam .55s cubic-bezier(.5,0,.4,1.4) both}
+.bigstamp .stampmark b{font-size:44px}.bigstamp .stampmark i{font-size:17px}
+@keyframes slam{0%{transform:scale(3) rotate(-30deg);opacity:0}60%{transform:scale(.92) rotate(-12deg);opacity:1}100%{transform:scale(1) rotate(-14deg)}}
+.quake{animation:quake .35s .3s}
+@keyframes quake{25%{transform:translate(4px,-3px)}50%{transform:translate(-4px,3px)}75%{transform:translate(3px,2px)}}
+canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:90}
+
+/* ===== survey ===== */
+.sv{padding:12px 16px 0;text-align:center}
+.sv .stage-lbl{display:inline-block;margin-top:6px;background:var(--navy);color:#fff;border-radius:999px;padding:6px 14px;font-size:13px;letter-spacing:.5px}
+.keys{display:flex;justify-content:center;gap:6px;margin:16px 0 0}
+.keys i{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--ink);background:#fff;display:grid;place-items:center;transition:.3s}
+.keys i svg{width:18px;height:18px;opacity:.18}
+.keys i.on{background:#FFD43B;transform:scale(1.1)}.keys i.on svg{opacity:1}
+.giftmini{width:120px;margin:16px auto 0;transition:transform .3s}
+.qcard{margin:16px 0 0;padding:24px 16px 20px;animation:slidein .35s cubic-bezier(.2,1.2,.4,1)}
+@keyframes slidein{from{transform:translateX(60px);opacity:0}}
+.qcard h2{margin:0;font-size:23px;line-height:1.35;color:var(--navy);word-break:keep-all}
+.qcard .qn{font-size:13px;color:var(--pink);margin-bottom:8px}
+.opts{display:grid;gap:10px;margin-top:20px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opt{min-height:56px;border-radius:16px;border:3px solid var(--ink);background:#fff;font-size:17px;color:var(--navy);box-shadow:0 4px 0 var(--ink);padding:8px 10px;line-height:1.3;word-break:keep-all;transition:transform .08s,background .15s}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.opt.sel{background:#FFD43B}
+.faces{display:flex;justify-content:space-between;gap:4px;margin-top:22px}
+.face{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12.5px;color:var(--navy)}
+.face svg{width:100%;max-width:62px;transition:transform .2s}
+.face:active svg{transform:scale(.9)}
+.face.sel svg{transform:scale(1.2) rotate(-6deg)}
+.gauge{display:flex;flex-direction:column;gap:9px;margin-top:20px}
+.gauge .opt{display:flex;align-items:center;gap:12px;text-align:left}
+.bat{flex:0 0 74px;height:30px;border:3px solid var(--ink);border-radius:8px;position:relative;padding:3px;display:flex;gap:3px;background:#fff}
+.bat::after{content:"";position:absolute;right:-8px;top:7px;width:5px;height:10px;background:var(--ink);border-radius:0 3px 3px 0}
+.bat u{flex:1;border-radius:3px;background:#E4E8F0}
+.textq textarea{width:100%;height:110px;border-radius:16px;border:3px solid var(--ink);padding:14px;font-size:17px;font-family:inherit;background:#FFFBE0;resize:none;outline:none;margin-top:18px;color:var(--navy)}
+.combo{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:85;pointer-events:none;font-size:34px;white-space:nowrap;animation:combo .8s ease-out forwards}
+@keyframes combo{0%{transform:translate(-50%,-30%) scale(.4);opacity:0}30%{transform:translate(-50%,-50%) scale(1.15);opacity:1}100%{transform:translate(-50%,-120%) scale(1);opacity:0}}
+
+/* ===== gift ===== */
+.gift{padding:20px 16px 0;text-align:center;min-height:80vh;display:flex;flex-direction:column;align-items:center}
+.gift h1{font-size:30px;margin:14px 0 0;line-height:1.25}
+.gift .tap{margin-top:8px;font-size:17px;color:var(--navy)}
+.rays{position:relative;width:300px;height:300px;margin-top:20px;display:grid;place-items:center}
+.rays::before{content:"";position:absolute;inset:-30px;border-radius:50%;background:repeating-conic-gradient(rgba(255,255,255,.75) 0 10deg,transparent 10deg 24deg);animation:spin 14s linear infinite;
+  -webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.giftbox{width:220px;position:relative;z-index:2;transition:transform .1s}
+.giftbox.wobble{animation:wobble .4s}
+@keyframes wobble{20%{transform:rotate(-9deg) scale(1.06)}45%{transform:rotate(8deg) scale(1.08)}70%{transform:rotate(-4deg)}}
+.giftbox .lid{transform-origin:50% 100%;transition:transform .6s cubic-bezier(.3,1.6,.5,1)}
+.giftbox.open .lid{transform:translateY(-170px) rotate(-28deg);opacity:0;transition:transform .7s ease-out,opacity .7s .2s}
+.taps{display:flex;gap:10px;margin-top:22px}
+.taps i{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--ink);background:#fff}
+.taps i.on{background:var(--pink)}
+
+/* ===== voucher ===== */
+.vwrap{padding:14px 16px 0;text-align:center}
+.vwrap h1{font-size:28px;margin:10px 0 0;line-height:1.25}
+.ticket{margin:22px 4px 0;background:#fff;border:3px solid var(--ink);border-radius:24px;position:relative;overflow:visible;animation:rise .7s cubic-bezier(.2,1.4,.4,1);box-shadow:7px 8px 0 var(--pink)}
+@keyframes rise{from{transform:translateY(160px) scale(.6);opacity:0}}
+.ticket .t-top{background:var(--blue);border-bottom:3px dashed var(--ink);border-radius:21px 21px 0 0;padding:22px 16px 20px;color:#fff;position:relative}
+.ticket .t-top .k{font-size:14px;opacity:.95;text-shadow:0 1px 0 rgba(34,50,90,.4)}
+.ticket .t-top .big{font-size:30px;margin-top:6px;line-height:1.2;text-shadow:0 3px 0 var(--ink),2px 0 var(--ink),-2px 0 var(--ink),0 -2px var(--ink),0 2px var(--ink)}
+.ticket .t-top .big small{display:block;font-size:19px;margin-top:4px}
+.ticket .notch{position:absolute;bottom:-17px;width:32px;height:32px;border-radius:50%;background:var(--yellow);border:3px solid var(--ink);z-index:2}
+.ticket .notch.l{left:-18px;clip-path:inset(0 0 0 50%)}.ticket .notch.r{right:-18px;clip-path:inset(0 50% 0 0)}
+.ticket .t-body{padding:24px 18px 20px}
+.ticket .who{font-size:20px;color:var(--navy)}
+.ticket .code{margin:10px auto 0;display:inline-block;font-size:30px;letter-spacing:3px;color:var(--navy);background:#FFF6C2;border:2.5px solid var(--ink);border-radius:12px;padding:6px 16px}
+.ticket .when{font-size:12.5px;color:#6b7590;margin-top:10px}
+.ticket .go{margin-top:16px;background:var(--pink-l);border-radius:14px;padding:12px;font-size:16px;color:var(--navy);line-height:1.45}
+.ticket .used-mark{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) rotate(-16deg);border:6px solid #E2457A;color:#E2457A;border-radius:16px;padding:8px 18px;font-size:34px;background:rgba(255,255,255,.88);letter-spacing:2px;white-space:nowrap}
+.ticket .used-mark small{display:block;font-size:13px;letter-spacing:0;text-align:center}
+.ticket.used .t-top{background:#9AA3B5}
+.notes{margin:24px 4px 0;padding:18px 16px 14px;text-align:left}
+.notes ul{margin:4px 0 0;padding-left:18px;font-size:13.5px;line-height:1.6;color:var(--navy)}
+.staff-btn{margin:20px auto 0;font-size:13px;color:#4a5778;text-decoration:underline;text-underline-offset:3px;padding:8px}
+.pin{display:flex;justify-content:center;gap:10px;margin-top:16px}
+.pin i.on::after{content:"";width:16px;height:16px;border-radius:50%;background:var(--ink)}
+.pin i{width:46px;height:56px;border-radius:12px;border:3px solid var(--ink);display:grid;place-items:center;font-size:26px;font-style:normal;background:#FFFBE0}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:16px}
+.pad button{height:54px;border-radius:14px;border:2.5px solid var(--ink);background:#fff;font-size:22px;color:var(--navy);box-shadow:0 3px 0 var(--ink)}
+.pad button:active{transform:translateY(2px);box-shadow:none}
+.allclear{margin:20px 4px 0;padding:16px;display:flex;gap:12px;align-items:center;text-align:left;font-size:14px;color:var(--navy);line-height:1.4}
+.allclear .medal{flex:0 0 60px}
+.toast{position:fixed;left:50%;bottom:calc(110px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:999px;padding:12px 18px;font-size:14px;z-index:99;animation:fade .2s;white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<canvas id="fx"></canvas>
+
+<script>
+/* =====================================================================
+   설정 (CONFIG) — 행사 운영 내용이 바뀌면 여기만 고치면 됩니다
+   ===================================================================== */
+const CONFIG = {
+  goal: 4,                       // 교환권 받을 수 있는 인증 개수
+  staffPin: '1017',              // 운영본부 '교환 완료' 확인용 PIN (행사 전 변경 권장)
+  experienceTime: '13:00 ~ 14:30',
+  voucherUse: 'CHILL 힐링존',
+  voucherUntil: '16:30',
+  // Firebase 웹앱 설정 (README 참고). 비워두면 기기 저장만 하는 '로컬 모드'로 동작
+  firebase: null,
+  booths: [
+    { id:'b1', host:'청운위', name:'청운위의 볼꾸 힐링타임', short:'볼꾸 힐링타임', icon:'face', c:'#F27BA6', cl:'#FDDDE8', cd:'#D94F82',
+      line:'오늘 기분, 내가 ○○!', answer:['꾸','며'], tiles:['꾸','며','봐','그','려','줘'] },
+    { id:'b2', host:'청참위', name:'청참위의 거북이 키링 만들기', short:'거북이 키링', icon:'turtle', c:'#2FA58F', cl:'#D3F0E6', cd:'#1E8571',
+      line:'고민은 털어놓고 ○○을 챙겨가!', answer:['행','운'], tiles:['행','운','선','물','사','랑'] },
+    { id:'b3', host:'루키', name:'루키의 농구왕 도전', short:'농구왕 도전', icon:'ball', c:'#F7941D', cl:'#FFE3C2', cd:'#D7740A',
+      line:'고민까지 ○!', answer:['슛'], tiles:['슛','골','팡','쿵','휙','콕'] },
+    { id:'b4', host:'도레', name:'도레의 꿈꾸는 쿠키공방', short:'꿈꾸는 쿠키공방', icon:'cookie', c:'#C98A4B', cl:'#F6E3CC', cd:'#A86A2E',
+      line:'당 충전, ○○충전!', answer:['마','음'], tiles:['마','음','당','힘','꿈','기'] },
+    { id:'b5', host:'AI 체험', name:'AI 마음자판기', short:'AI 마음자판기', icon:'vending', c:'#5BB8EE', cl:'#D6EEFB', cd:'#2C8FCB',
+      line:'내 마음을 ○○줘!', answer:['읽','어'], tiles:['읽','어','알','봐','들','줘'] },
+    { id:'b6', host:'아로마', name:'힐링 아로마 롤온 만들기', short:'아로마 롤온', icon:'roll', c:'#9B7FD6', cl:'#E8E0F7', cd:'#7A5CC0',
+      line:'향기로 기분 ○', answer:['RESET'], tiles:['RESET','RELAX','CHARGE','REPLAY'] },
+    { id:'b7', host:'역삼청소년센터', name:"디지털 안전캠페인 '잠시 멈춤 OFF'", short:'잠시 멈춤 OFF', icon:'phone', c:'#1F4A86', cl:'#DCE5F3', cd:'#1F4A86',
+      line:"디지털 안전캠페인 '잠시 ○○ OFF'", answer:['멈','춤'], tiles:['멈','춤','정','지','휴','식'] },
+  ],
+  survey: [
+    { id:'overall', type:'face',  q:'오늘 IN:JOY,<br>한마디로 어땠어?' },
+    { id:'best',    type:'booth', q:'제일 재밌었던<br>체험은 뭐야?' },
+    { id:'before',  type:'gauge', q:'축제 오기 전,<br>내 스트레스 게이지는?' },
+    { id:'after',   type:'gauge', q:'그럼 지금!<br>내 스트레스 게이지는?' },
+    { id:'again',   type:'pick',  q:'다음 어울림마당에도<br>또 올 거야?', opts:['무조건 와!','아마 올 듯','글쎄…','잘 모르겠어'] },
+    { id:'channel', type:'pick',  q:'이 축제,<br>어떻게 알고 왔어?', opts:['학교 안내','청소년센터','SNS','친구·가족','지나가다 우연히','기타'], two:true },
+    { id:'grade',   type:'pick',  q:'나는 지금…', opts:['초등학생','중학생','고등학생','그 외'], two:true },
+    { id:'comment', type:'text',  q:'마지막!<br>축제에 한마디 남겨줘', optional:true },
+  ]
+};
+
+/* ===================================================================== */
+const KEY='injoy2026_v1';
+const $=s=>document.querySelector(s);
+const app=$('#app');
+let S=load();
+function load(){ try{ const v=JSON.parse(localStorage.getItem(KEY)); if(v&&v.id) return v; }catch(e){} return {id:null,nick:'',stamps:{},rewardShown:false,survey:{},surveyDone:false,voucher:null,mute:false,allShown:false}; }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+if(new URLSearchParams(location.search).has('reset')||location.hash==='#reset'){ try{localStorage.removeItem(KEY)}catch(e){} try{history.replaceState(null,'',location.pathname)}catch(e){} S=load(); }
+const cnt=()=>Object.keys(S.stamps).length;
+const booth=id=>CONFIG.booths.find(b=>b.id===id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const vib=p=>{ try{ navigator.vibrate&&navigator.vibrate(p) }catch(e){} };
+function uid(){ return (crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)); }
+function hhmm(t){ const d=new Date(t); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+
+/* ---------- Firebase (선택) ---------- */
+let db=null, FS=null;
+async function initFB(){
+  if(!CONFIG.firebase) return;
+  try{
+    const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    FS=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    db=FS.getFirestore(A.initializeApp(CONFIG.firebase));
+    if(S.id) sync({});
+  }catch(e){ console.warn('firebase off',e); }
+}
+function sync(extra){
+  if(!db||!S.id) return;
+  const data={ nick:S.nick, createdAt:S.startedAt||Date.now(), stamps:S.stamps, stampCount:cnt(), surveyDone:!!S.surveyDone, updatedAt:FS.serverTimestamp(), ...extra };
+  FS.setDoc(FS.doc(db,'participants',S.id),data,{merge:true}).catch(e=>console.warn(e));
+}
+
+/* ---------- sound ---------- */
+let AC=null;
+function tone(f,d=.08,type='sine',v=.18,when=0){
+  if(S.mute) return;
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); const t=AC.currentTime+when;
+    const o=AC.createOscillator(),g=AC.createGain(); o.type=type; o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.001,t+d); o.connect(g).connect(AC.destination); o.start(t); o.stop(t+d+.02);}catch(e){}
+}
+const sfx={
+  tap:()=>tone(720,.06,'triangle',.15),
+  ok:()=>{[660,880,1175].forEach((f,i)=>tone(f,.14,'triangle',.18,i*.08))},
+  no:()=>{tone(200,.22,'square',.08);tone(150,.25,'square',.06,.08)},
+  stamp:()=>{tone(90,.3,'sine',.5);tone(60,.35,'triangle',.3,.02)},
+  fan:()=>{[523,659,784,1046,1318].forEach((f,i)=>tone(f,.22,'triangle',.2,i*.09));tone(1568,.5,'sine',.15,.5)},
+  key:()=>{tone(988,.08,'square',.06);tone(1318,.12,'triangle',.14,.06)}
+};
+
+/* ---------- confetti ---------- */
+const cv=$('#fx'),cx=cv.getContext('2d'); let parts=[],raf=0;
+function fit(){ cv.width=innerWidth*devicePixelRatio; cv.height=innerHeight*devicePixelRatio; }
+addEventListener('resize',fit); fit();
+function confetti(n=120,x=.5,y=.45,power=1){
+  const cols=['#F27BA6','#F7941D','#5BB8EE','#8DC63F','#FFD43B','#ffffff','#1F4A86'];
+  for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2, s=(4+Math.random()*9)*power*devicePixelRatio;
+    parts.push({x:x*cv.width,y:y*cv.height,vx:Math.cos(a)*s,vy:Math.sin(a)*s-6*devicePixelRatio,w:(6+Math.random()*7)*devicePixelRatio,h:(4+Math.random()*5)*devicePixelRatio,
+      r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[i%cols.length],life:110+Math.random()*60,shape:Math.random()<.3?'c':'r'}); }
+  if(!raf) loop();
+}
+function loop(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  parts=parts.filter(p=>p.life-->0);
+  for(const p of parts){ p.vy+=.28*devicePixelRatio; p.vx*=.985; p.vy*=.985; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr;
+    cx.save(); cx.translate(p.x,p.y); cx.rotate(p.r); cx.fillStyle=p.c; cx.globalAlpha=Math.min(1,p.life/40);
+    if(p.shape==='c'){cx.beginPath();cx.arc(0,0,p.w/2.4,0,7);cx.fill()} else cx.fillRect(-p.w/2,-p.h/2,p.w,p.h); cx.restore(); }
+  raf=parts.length?requestAnimationFrame(loop):0; if(!raf) cx.clearRect(0,0,cv.width,cv.height);
+}
+
+/* ---------- svg ---------- */
+const K='#22325A';
+const ICON={
+ face:`<svg viewBox="0 0 64 64"><circle cx="32" cy="34" r="22" fill="#FFE0D2" stroke="${K}" stroke-width="3"/><path d="M12 30c2-14 12-20 20-20s18 6 20 20c-6-6-12-8-20-8s-14 2-20 8z" fill="${K}"/><circle cx="24" cy="36" r="2.4" fill="${K}"/><circle cx="40" cy="36" r="2.4" fill="${K}"/><path d="M28 43q4 3 8 0" stroke="${K}" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M17 41l1.6 3.2 3.5.5-2.5 2.4.6 3.5-3.2-1.7-3.1 1.7.6-3.5-2.5-2.4 3.5-.5z" fill="#F27BA6"/><circle cx="45" cy="44" r="4" fill="#F7A2C2"/></svg>`,
+ turtle:`<svg viewBox="0 0 64 64"><circle cx="32" cy="9" r="5" fill="none" stroke="${K}" stroke-width="3"/><path d="M32 14v6" stroke="${K}" stroke-width="3"/><ellipse cx="14" cy="38" rx="7" ry="6" fill="#9FDB7A" stroke="${K}" stroke-width="3"/><circle cx="12" cy="37" r="1.6" fill="${K}"/><ellipse cx="22" cy="51" rx="5" ry="4" fill="#9FDB7A" stroke="${K}" stroke-width="3"/><ellipse cx="44" cy="51" rx="5" ry="4" fill="#9FDB7A" stroke="${K}" stroke-width="3"/><path d="M18 44a15 15 0 0 1 30 0z" fill="#2FA58F" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><path d="M33 22v22M25 28l5 8M41 28l-5 8M22 40h22" stroke="#BDEBD9" stroke-width="2.4" fill="none"/><path d="M48 42l6 3" stroke="${K}" stroke-width="3" stroke-linecap="round"/></svg>`,
+ ball:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#F7941D" stroke="${K}" stroke-width="3"/><path d="M10 32h44M32 10v44M16 16c8 8 8 24 0 32M48 16c-8 8-8 24 0 32" stroke="${K}" stroke-width="2.6" fill="none"/></svg>`,
+ cookie:`<svg viewBox="0 0 64 64"><circle cx="17" cy="17" r="8" fill="#E9B57A" stroke="${K}" stroke-width="3"/><circle cx="47" cy="17" r="8" fill="#E9B57A" stroke="${K}" stroke-width="3"/><circle cx="32" cy="35" r="21" fill="#E9B57A" stroke="${K}" stroke-width="3"/><circle cx="24" cy="32" r="2.6" fill="${K}"/><circle cx="40" cy="32" r="2.6" fill="${K}"/><ellipse cx="32" cy="41" rx="7" ry="5" fill="#F6D7AE" stroke="${K}" stroke-width="2.2"/><circle cx="32" cy="39.5" r="1.8" fill="${K}"/><circle cx="20" cy="40" r="2.6" fill="#F7A2C2"/><circle cx="44" cy="40" r="2.6" fill="#F7A2C2"/></svg>`,
+ vending:`<svg viewBox="0 0 64 64"><rect x="13" y="7" width="38" height="50" rx="6" fill="#5BB8EE" stroke="${K}" stroke-width="3"/><rect x="18" y="13" width="28" height="22" rx="3" fill="#fff" stroke="${K}" stroke-width="2.6"/><path d="M32 30c-7-4.5-9-8-6.5-11 2-2.2 5-1 6.5 1.2 1.5-2.2 4.5-3.4 6.5-1.2 2.5 3 .5 6.5-6.5 11z" fill="#F27BA6" stroke="${K}" stroke-width="2"/><rect x="18" y="41" width="18" height="9" rx="2" fill="#22325A"/><circle cx="43" cy="45" r="3" fill="#FFD43B" stroke="${K}" stroke-width="2"/><text x="23" y="48.5" font-size="7" fill="#fff" font-family="sans-serif" font-weight="700">AI</text></svg>`,
+ roll:`<svg viewBox="0 0 64 64"><path d="M44 8c2 6 0 10-3 12M48 12c-3 0-5 1-6 3M50 18c-3-1-6 0-8 1" stroke="#7A5CC0" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="45" cy="8" r="2.4" fill="#9B7FD6"/><circle cx="49" cy="12" r="2.4" fill="#9B7FD6"/><circle cx="51" cy="18" r="2.4" fill="#9B7FD6"/><rect x="22" y="14" width="14" height="10" rx="3" fill="#E8E0F7" stroke="${K}" stroke-width="3"/><rect x="18" y="23" width="22" height="34" rx="7" fill="#9B7FD6" stroke="${K}" stroke-width="3"/><rect x="22" y="32" width="14" height="14" rx="3" fill="#fff" stroke="${K}" stroke-width="2"/><path d="M26 39h6M29 36v6" stroke="#9B7FD6" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+ phone:`<svg viewBox="0 0 64 64"><rect x="17" y="6" width="30" height="52" rx="7" fill="#fff" stroke="${K}" stroke-width="3"/><rect x="21" y="13" width="22" height="36" rx="3" fill="#22325A"/><path d="M32 22v8" stroke="#FFD43B" stroke-width="3.4" stroke-linecap="round"/><path d="M26.5 25.5a8 8 0 1 0 11 0" stroke="#FFD43B" stroke-width="3.4" fill="none" stroke-linecap="round"/><circle cx="32" cy="53.5" r="2" fill="${K}"/></svg>`
+};
+const KEYSVG=`<svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="4.5" fill="none" stroke="${K}" stroke-width="2.6"/><path d="M12.5 12H21M18 12v3.5M21 12v2.5" stroke="${K}" stroke-width="2.6" stroke-linecap="round"/></svg>`;
+function faceSVG(lvl){ // 1..5
+  const fills=['#9DB4D6','#ACDBF5','#FFE38A','#FFC15A','#F7941D'];
+  const m={1:'M22 46q10-8 20 0',2:'M23 44q9-4 18 0',3:'M23 43h18',4:'M22 41q10 7 20 0',5:'M20 39q12 13 24 0z'}[lvl];
+  const eyes=lvl===5?`<path d="M19 28q4-5 8 0M37 28q4-5 8 0" stroke="${K}" stroke-width="3" fill="none" stroke-linecap="round"/>`:`<circle cx="23" cy="28" r="3" fill="${K}"/><circle cx="41" cy="28" r="3" fill="${K}"/>`;
+  return `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" fill="${fills[lvl-1]}" stroke="${K}" stroke-width="3"/>${eyes}<path d="${m}" stroke="${K}" stroke-width="3" fill="${lvl===5?'#fff':'none'}" stroke-linecap="round" stroke-linejoin="round"/>${lvl>=4?'<circle cx="16" cy="38" r="4" fill="#F7A2C2"/><circle cx="48" cy="38" r="4" fill="#F7A2C2"/>':''}</svg>`;
+}
+function balloon(w,c='#F7941D'){ return `<svg width="${w}" viewBox="0 0 60 110"><path d="M30 68c-1 10 4 16 0 26s3 12 0 16" stroke="${K}" stroke-width="2" fill="none"/><ellipse cx="30" cy="34" rx="25" ry="29" fill="${c}" stroke="${K}" stroke-width="2.6"/><path d="M26 64l4 5 4-5z" fill="${c}" stroke="${K}" stroke-width="2"/><path d="M15 25q4-12 15-14" stroke="#FFD43B" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`; }
+function sparkle(w){ return `<svg width="${w}" viewBox="0 0 40 40"><path d="M20 3c2 10 7 15 17 17-10 2-15 7-17 17-2-10-7-15-17-17 10-2 15-7 17-17z" fill="#fff" stroke="${K}" stroke-width="2.4" stroke-linejoin="round"/></svg>`; }
+function giftSVG(){ return `<svg viewBox="0 0 220 220" overflow="visible">
+  <g><rect x="28" y="96" width="164" height="112" rx="8" fill="#F27BA6" stroke="${K}" stroke-width="5"/>
+  <path d="M60 96v112M92 96v112M128 96v112M160 96v112" stroke="#fff" stroke-width="14" opacity=".9"/>
+  <rect x="96" y="96" width="28" height="112" fill="#5BB8EE" stroke="${K}" stroke-width="5"/></g>
+  <g class="lid"><rect x="16" y="66" width="188" height="38" rx="8" fill="#F7A2C2" stroke="${K}" stroke-width="5"/>
+  <rect x="96" y="66" width="28" height="38" fill="#5BB8EE" stroke="${K}" stroke-width="5"/>
+  <path d="M110 66c-30-34-62-20-50-4 8 10 30 6 50 4zM110 66c30-34 62-20 50-4-8 10-30 6-50 4z" fill="#5BB8EE" stroke="${K}" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="110" cy="64" r="11" fill="#FFD43B" stroke="${K}" stroke-width="5"/></g></svg>`; }
+const X=`<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="${K}" stroke-width="3" stroke-linecap="round"/></svg>`;
+const SND=()=>S.mute?`<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="${K}"/><path d="M16 9l5 6M21 9l-5 6" stroke="${K}" stroke-width="2.6" stroke-linecap="round"/></svg>`:`<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="${K}"/><path d="M16 8.5q3 3.5 0 7M18.5 6q5 6 0 12" stroke="${K}" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`;
+
+function topBar(){ return `<div class="topbar"><img class="logos" src="assets/logos.webp" alt="강남구 · 강남청소년센터"><button class="icon-btn" id="mute" aria-label="소리">${SND()}</button></div>`; }
+function bindTop(){ const m=$('#mute'); if(m) m.onclick=()=>{S.mute=!S.mute;save();m.innerHTML=SND();}; }
+function bg(cls){ document.body.className=cls||''; }
+function toast(t){ const d=document.createElement('div'); d.className='toast'; d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),2200); }
+
+/* ===================== INTRO ===================== */
+function renderIntro(){
+  bg('');
+  app.innerHTML=`${topBar()}
+  <section class="intro">
+    <div class="balloon" style="left:-6px;top:40px">${balloon(44)}</div>
+    <div class="balloon" style="right:-4px;top:150px;animation-delay:-1.5s">${balloon(52)}</div>
+    <div class="bubble-wrap"><div class="bubble" style="color:var(--ink)"><span>스트레스는 OFF!<br>즐거움은 ON!</span></div></div>
+    <img class="title-img" src="assets/title.webp" alt="청소년 힐링축제 IN:JOY & 청소년 SHOW 음악중심">
+    <div class="date-line">2026. 10. 17.(토) · 강남스퀘어</div>
+    <div class="card join shadow-pink"><div class="tape grid"></div>
+      <h3>힐링 스탬프 투어 시작!</h3>
+      <div class="tiny">닉네임만 정해줘. 다른 개인정보는 받지 않아!</div>
+      <div class="field"><input id="nick" maxlength="8" placeholder="닉네임 (최대 8자)" autocomplete="off" enterkeyhint="go"></div>
+      <div style="margin-top:14px"><button class="btn pink" id="start">투어 시작하기 ▶</button></div>
+    </div>
+    <div class="card how shadow-blue"><div class="tape dots"></div>
+      <h3 class="out-g" style="margin:0;font-size:22px;text-align:center">이렇게 놀면 돼!</h3>
+      <ol>
+        <li><span class="n">1</span><span>힐링 놀이터 체험부스 7곳 중<br>원하는 곳에서 체험하기</span></li>
+        <li><span class="n">2</span><span>체험이 끝나면 부스 퀴즈를 풀고<br><b style="font-weight:normal;color:var(--pink)">스탬프 쾅!</b></span></li>
+        <li><span class="n">3</span><span>스탬프 <b style="font-weight:normal;color:var(--pink)">${CONFIG.goal}개</b>를 모으면<br>마지막 선물상자 퀘스트 오픈</span></li>
+        <li><span class="n">4</span><span>운영본부에서 ${CONFIG.voucherUse}<br>식음료 교환권 받기!</span></li>
+      </ol>
+    </div>
+    <div class="chars"><img src="assets/charL.webp" alt=""><img src="assets/charR.webp" alt=""></div>
+  </section>`;
+  bindTop();
+  const go=()=>{ const v=$('#nick').value.trim().replace(/\s+/g,' ');
+    if(!v){ $('#nick').classList.remove('shake'); void $('#nick').offsetWidth; $('#nick').classList.add('shake'); sfx.no(); return; }
+    sfx.ok(); S.id=uid(); S.nick=v; S.startedAt=Date.now(); save(); sync({createdAt:S.startedAt}); confetti(80,.5,.35,.8); renderHome(); scrollTo(0,0); };
+  $('#start').onclick=go; $('#nick').onkeydown=e=>{ if(e.key==='Enter') go(); };
+}
+
+/* ===================== HOME ===================== */
+function renderHome(){
+  bg('');
+  const n=cnt(), g=CONFIG.goal, pct=Math.min(100,n/g*100), full=n>=g;
+  const msg = S.voucher ? (S.voucher.redeemedAt?'교환권 수령 완료! 남은 체험도 마음껏 즐겨 🎉':'교환권이 발급됐어! 운영본부로 가서 보여줘')
+    : full ? '미션 클리어! 이제 선물상자 퀘스트만 남았어'
+    : n===0 ? `체험하고 스탬프 ${g}개 모으면 스트레스 OFF!` : `스트레스 OFF까지 스탬프 ${g-n}개 남았어!`;
+  app.innerHTML=`${topBar()}
+  <section class="hello">
+    <div class="nick">🙌 <b style="font-weight:normal">${esc(S.nick)}</b>의 IN:JOY 스탬프 투어</div>
+    <h1 class="out">신나게 체험하고<br>스트레스 날려버려!</h1>
+  </section>
+  <div class="card meter shadow-orange"><div class="tape stripe"></div>
+    <div class="row"><span class="label">모은 스탬프</span><span class="count">${n}<small> / ${g}</small></span></div>
+    <div class="switch ${full?'full':''}"><div class="fill" style="width:${full?100:Math.max(pct,0)}%"></div>
+      ${Array.from({length:g-1},(_,i)=>`<div class="seg" style="left:${(i+1)/g*100}%"></div>`).join('')}
+      <span class="tag off">${full?'스트레스 OFF ✓':'스트레스'}</span><span class="tag on">${full?'즐거움 ON!':'즐거움 ON'}</span></div>
+    <div class="msg">${msg}</div>
+  </div>
+  <div class="sec-title"><span>힐링 놀이터 ZONE</span></div>
+  <div class="sec-sub">체험 운영 ${CONFIG.experienceTime} · 부스를 눌러 퀴즈 인증!</div>
+  <div class="grid">${CONFIG.booths.map((b,i)=>boothCard(b,i===CONFIG.booths.length-1&&CONFIG.booths.length%2===1)).join('')}</div>
+  ${n===CONFIG.booths.length?`<div class="card allclear shadow-pink"><div class="medal">${medal()}</div><div><b style="font-weight:normal;font-size:17px">7개 올클리어 달성!</b><br>오늘의 진짜 IN:JOY 마스터는 바로 너야.</div></div>`:''}
+  <div class="card info shadow-blue"><div class="tape green"></div>
+    <h3 class="out-g" style="margin:0 0 6px;font-size:20px;text-align:center">꼭 확인해 줘!</h3>
+    <dl>
+      <dt>체험</dt><dd>${CONFIG.experienceTime} 힐링 놀이터 체험부스</dd>
+      <dt>보상</dt><dd>스탬프 ${CONFIG.goal}개 + 선물상자 퀘스트 완료 시 운영본부에서 ${CONFIG.voucherUse} 식음료 교환권 지급</dd>
+      <dt>사용</dt><dd>${CONFIG.voucherUse}에서 당일 ${CONFIG.voucherUntil}까지</dd>
+      <dt>안내</dt><dd>1인 1회 지급 · 준비된 상품이 소진되면 조기 마감될 수 있어요</dd>
+    </dl>
+  </div>
+  <div class="foot"><img class="logos" src="assets/logos.webp" alt=""><div class="tiny">2026 강남구 청소년어울림마당<br>청소년 힐링축제 IN:JOY × 청소년Show음악중심</div></div>
+  ${dock()}`;
+  bindTop();
+  app.querySelectorAll('.booth').forEach(el=>el.onclick=()=>{ sfx.tap(); openQuiz(el.dataset.id); });
+  const d=$('#dockbtn'); if(d) d.onclick=()=>{ sfx.tap(); if(S.voucher) renderVoucher(); else if(S.surveyDone) renderGift(); else renderSurveyIntro(); };
+}
+function boothCard(b,wide){
+  const done=S.stamps[b.id];
+  const st=`style="--c:${b.c};--cl:${b.cl};--c-d:${b.cd}"`;
+  const stamp=done?`<div class="stamp"><div class="stampmark"><div><b>CLEAR</b><i>${hhmm(done)}</i></div></div></div>`:'';
+  if(wide) return `<button class="booth wide ${done?'done':''}" data-id="${b.id}" ${st}><div class="ico">${ICON[b.icon]}</div><div class="txt"><span class="host">${b.host}</span><span class="name">${b.name}</span></div><span class="go">${done?'':'도전 ›'}</span>${stamp}</button>`;
+  return `<button class="booth ${done?'done':''}" data-id="${b.id}" ${st}><div class="ico">${ICON[b.icon]}</div><span class="host">${b.host}</span><span class="name">${b.short}</span><span class="go">${done?'':'퀴즈 인증 ›'}</span>${stamp}</button>`;
+}
+function dock(){
+  if(S.voucher) return `<div class="dock"><button class="btn ${S.voucher.redeemedAt?'white':'pink pulse'}" id="dockbtn">🎟️ 내 교환권 보기</button></div>`;
+  if(cnt()>=CONFIG.goal){
+    if(S.surveyDone) return `<div class="dock"><button class="btn pink pulse" id="dockbtn">🎁 선물상자 열러 가기</button></div>`;
+    return `<div class="dock"><div class="hint">교환권까지 딱 한 단계! 다른 체험은 계속할 수 있어</div><button class="btn pink pulse" id="dockbtn">🎁 교환권 받으러 가기</button></div>`;
+  }
+  return '';
+}
+function medal(){ return `<svg viewBox="0 0 64 64"><path d="M20 4l8 18M44 4l-8 18" stroke="${K}" stroke-width="7"/><path d="M20 4l8 18M44 4l-8 18" stroke="#F27BA6" stroke-width="3.5"/><circle cx="32" cy="40" r="20" fill="#FFD43B" stroke="${K}" stroke-width="3"/><path d="M32 28l3.6 7.4 8.1 1.2-5.9 5.7 1.4 8.1-7.2-3.8-7.2 3.8 1.4-8.1-5.9-5.7 8.1-1.2z" fill="#fff" stroke="${K}" stroke-width="2.2" stroke-linejoin="round"/></svg>`; }
+
+/* ===================== QUIZ SHEET ===================== */
+function openQuiz(id){
+  const b=booth(id), done=S.stamps[id];
+  const sc=document.createElement('div'); sc.className='scrim';
+  const st=`--c:${b.c};--cl:${b.cl}`;
+  let picked=[], lock=false;
+  const tiles=[...b.tiles].sort(()=>Math.random()-.5);
+  const wideTiles=b.tiles.some(t=>t.length>2);
+  function sentence(){
+    let k=0;
+    // 연속된 ○는 하나의 단어(슬롯 묶음)로 표시
+    let html='';
+    b.line.replace(/○+|[^○]+/g,m=>{ if(m[0]==='○'){ for(let j=0;j<m.length;j++){ const v=picked[k]; html+=`<span class="slot ${v?'filled':''}">${v?esc(v):''}</span>`; k++; } } else html+=`<span>${esc(m)}</span>`; return m; });
+    return html;
+  }
+  let drawn=false;
+  function draw(){
+    sc.innerHTML=`<div class="sheet ${drawn?'still':''}" style="${st}">
+      <div class="head"><button class="icon-btn x" aria-label="닫기">${X}</button>
+        <div class="ico">${ICON[b.icon]}</div><div class="sub">${b.host}</div><h2>${b.name}</h2></div>
+      ${done?`<div class="quiz"><div style="display:grid;place-items:center;margin-top:6px"><div class="stampmark"><div><b>CLEAR</b><i>${hhmm(done)}</i></div></div></div>
+        <p class="q" style="margin-top:18px">이미 인증 완료한 부스야!<br>다른 부스도 도전해 봐 😎</p>
+        <div class="row2"><button class="btn white" data-close>확인</button></div></div>`
+      :`<div class="quiz">
+        <div class="q"><b>체험 다 했어?</b> 그럼 부스 현수막을 찾아서<br>빈칸에 들어갈 말을 골라줘!</div>
+        <div class="sentence">${sentence()}</div>
+        <div class="feedback" id="fb"></div>
+        <div class="tiles ${wideTiles?'wide':''}">${tiles.map((t,i)=>`<button class="tile ${usedIdx.has(i)?'used':''}" data-i="${i}">${esc(t)}</button>`).join('')}</div>
+        <div class="row2"><button class="btn white" id="undo">↺ 다시 고르기</button></div>
+        <div class="hintbox"><span>💡</span><span>정답은 체험부스 현수막에 숨어 있어. 헷갈리면 부스 진행자 쌤한테 물어봐!</span></div>
+      </div>`}
+    </div>`;
+    drawn=true;
+    sc.querySelector('.x').onclick=close;
+    sc.querySelectorAll('[data-close]').forEach(e=>e.onclick=close);
+    if(done) return;
+    sc.querySelectorAll('.tile').forEach(el=>el.onclick=()=>pick(+el.dataset.i));
+    $('#undo').onclick=()=>{ if(lock) return; picked=[]; usedIdx.clear(); sfx.tap(); draw(); };
+  }
+  const usedIdx=new Set();
+  function pick(i){
+    if(lock||usedIdx.has(i)||picked.length>=b.answer.length) return;
+    sfx.tap(); vib(10); usedIdx.add(i); picked.push(tiles[i]); draw();
+    if(picked.length===b.answer.length) setTimeout(check,260);
+  }
+  function check(){
+    const ok=picked.join('')===b.answer.join('');
+    if(ok){ lock=true; sfx.ok(); const fb=$('#fb'); fb.className='feedback ok'; fb.textContent='딩동댕! 정답이야 🎉'; setTimeout(()=>{ close(); award(id); },550); }
+    else { lock=true; sfx.no(); vib([60,40,60]); const sh=sc.querySelector('.sheet'); sh.classList.remove('shake'); void sh.offsetWidth; sh.classList.add('shake');
+      const fb=$('#fb'); fb.className='feedback no'; fb.textContent='땡! 현수막을 다시 찾아봐';
+      setTimeout(()=>{ picked=[]; usedIdx.clear(); lock=false; draw(); const f=$('#fb'); if(f){f.className='feedback no';f.textContent='다시 도전!';} },1100); }
+  }
+  function close(){ sc.remove(); }
+  sc.onclick=e=>{ if(e.target===sc) close(); };
+  document.body.appendChild(sc); draw();
+}
+function award(id){
+  const b=booth(id); const before=cnt();
+  S.stamps[id]=Date.now(); save();
+  const ov=document.createElement('div'); ov.className='bigstamp';
+  ov.innerHTML=`<div class="stampmark" style="--c:${b.c}"><div><b>CLEAR!</b><i>${b.short}</i></div></div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>{ sfx.stamp(); vib([30,30,120]); app.classList.remove('quake'); void app.offsetWidth; app.classList.add('quake'); confetti(90,.5,.45,.9); },300);
+  const after=cnt();
+  sync(after>=CONFIG.goal&&before<CONFIG.goal?{eligibleAt:Date.now()}:{});
+  renderHome();
+  setTimeout(()=>{ ov.style.transition='opacity .35s'; ov.style.opacity=0; setTimeout(()=>ov.remove(),400);
+    if(after>=CONFIG.goal && !S.rewardShown){ S.rewardShown=true; save(); setTimeout(rewardModal,250); }
+    else if(after===CONFIG.booths.length && !S.allShown){ S.allShown=true; save(); setTimeout(()=>{ sfx.fan(); confetti(200,.5,.3,1.3); toast('🏅 7개 올클리어! 진짜 IN:JOY 마스터'); },250); }
+    else if(after<CONFIG.goal) toast(`스탬프 GET! ${CONFIG.goal-after}개만 더 모으면 보상 오픈`);
+  },1500);
+}
+function rewardModal(){
+  sfx.fan(); confetti(220,.5,.3,1.3); vib([80,60,80,60,200]);
+  const sc=document.createElement('div'); sc.className='scrim center';
+  sc.innerHTML=`<div class="modal" style="box-shadow:7px 8px 0 var(--pink)"><div class="tape pink"></div>
+    <div class="burst">${giftSVG()}</div>
+    <h2 class="out" style="font-size:27px">미션 ${CONFIG.goal}개 클리어!<br>보상 수령 가능!</h2>
+    <p>교환권을 받으려면 <b style="font-weight:normal;color:var(--pink)">마지막 단계</b>만 남았어!<br>선물상자 퀘스트(30초)를 깨면 운영본부에서 교환할 수 있는 <b style="font-weight:normal;color:var(--pink)">식음료 교환권</b>이 나타나.</p>
+    <div class="btns"><button class="btn pink" id="m-go">🎁 지금 교환권 받으러 가기</button><button class="btn white" id="m-later">체험 더 하고 올래</button></div>
+    <p class="tiny" style="margin-top:12px">나머지 체험도 계속 즐길 수 있어!</p></div>`;
+  document.body.appendChild(sc);
+  $('#m-go').onclick=()=>{ sc.remove(); renderSurveyIntro(); };
+  $('#m-later').onclick=()=>{ sc.remove(); sfx.tap(); };
+}
+
+/* ===================== SURVEY (FINAL QUEST) ===================== */
+let qi=0;
+function renderSurveyIntro(){
+  bg('pink'); scrollTo(0,0);
+  app.innerHTML=`${topBar()}<section class="sv">
+    <div class="stage-lbl">FINAL QUEST · 교환권 지급 마지막 단계</div>
+    <h1 class="out" style="font-size:31px;margin:16px 0 0;line-height:1.25">선물상자를<br>열어라!</h1>
+    <div class="giftmini" style="width:170px;animation:bob 2.4s ease-in-out infinite">${giftSVG()}</div>
+    <div class="card qcard shadow-blue" style="animation:none"><div class="tape grid"></div>
+      <p style="margin:0;font-size:16.5px;line-height:1.6;color:var(--navy);word-break:keep-all">질문에 하나씩 답할 때마다<br><b style="font-weight:normal;color:var(--pink)">열쇠 조각 🔑</b>이 모여!<br>열쇠 ${CONFIG.survey.length}개를 다 모으면 선물상자가 열리고<br><b style="font-weight:normal;color:var(--pink)">식음료 교환권</b>이 등장해.</p>
+      <div class="keys" style="margin-top:18px">${CONFIG.survey.map(()=>`<i>${KEYSVG}</i>`).join('')}</div>
+      <p class="tiny" style="margin:14px 0 0">톡톡 누르기만 하면 끝! 30초면 충분해. 답변은 더 좋은 축제를 만드는 데만 쓰여.</p>
+    </div>
+    <div style="margin:22px 4px 0"><button class="btn pink pulse" id="sv-go">퀘스트 시작! ▶</button></div>
+    <div style="margin:12px 4px 0"><button class="btn white" id="sv-back" style="height:50px;font-size:16px">‹ 스탬프 판으로</button></div>
+  </section>`;
+  bindTop();
+  $('#sv-go').onclick=()=>{ sfx.ok(); qi=firstUnanswered(); renderQ(); };
+  $('#sv-back').onclick=()=>{ sfx.tap(); renderHome(); scrollTo(0,0); };
+}
+function firstUnanswered(){ const i=CONFIG.survey.findIndex(q=>S.survey[q.id]===undefined); return i<0?CONFIG.survey.length-1:i; }
+const CHEERS=['좋아!','나이스!','오 굿!','완벽해!','거의 다 왔어!','최고야!','한 개 남았다!'];
+function renderQ(){
+  bg('pink'); scrollTo(0,0);
+  const q=CONFIG.survey[qi], N=CONFIG.survey.length, got=CONFIG.survey.filter(x=>S.survey[x.id]!==undefined).length;
+  const shakeLv=Math.min(8,got*1.1);
+  let body='';
+  if(q.type==='face') body=`<div class="faces">${[1,2,3,4,5].map(l=>`<button class="face ${S.survey[q.id]===l?'sel':''}" data-v="${l}">${faceSVG(l)}<span>${['별로','그냥','보통','좋아','최고!'][l-1]}</span></button>`).join('')}</div>`;
+  if(q.type==='booth') body=`<div class="opts two">${CONFIG.booths.map(b=>`<button class="opt ${S.survey[q.id]===b.id?'sel':''}" data-v="${b.id}">${b.short}</button>`).join('')}</div>`;
+  if(q.type==='pick') body=`<div class="opts ${q.two?'two':''}">${q.opts.map(o=>`<button class="opt ${S.survey[q.id]===o?'sel':''}" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
+  if(q.type==='gauge'){ const L=[[5,'꽉 찼어 (완전 많음)','#E2457A'],[4,'많은 편','#F7941D'],[3,'보통','#FFD43B'],[2,'조금','#8DC63F'],[1,'거의 없음','#5BB8EE']];
+    body=`<div class="gauge">${L.map(([v,t,c])=>`<button class="opt ${S.survey[q.id]===v?'sel':''}" data-v="${v}"><span class="bat">${[1,2,3,4,5].map(k=>`<u style="${k<=v?'background:'+c:''}"></u>`).join('')}</span><span>${t}</span></button>`).join('')}</div>`; }
+  if(q.type==='text') body=`<div class="textq"><textarea id="tx" maxlength="100" placeholder="재밌었던 점, 아쉬웠던 점 뭐든 좋아! (안 써도 돼)">${esc(S.survey[q.id]||'')}</textarea></div>
+    <div style="display:grid;gap:10px;margin-top:14px"><button class="btn pink" id="tx-ok">열쇠 받고 선물상자 열기 🔑</button></div>`;
+  app.innerHTML=`${topBar()}<section class="sv">
+    <div class="stage-lbl">FINAL QUEST · 열쇠 ${got} / ${N}</div>
+    <div class="keys">${CONFIG.survey.map(x=>`<i class="${S.survey[x.id]!==undefined?'on':''}">${KEYSVG}</i>`).join('')}</div>
+    <div class="giftmini" id="gm" style="animation:wobble ${Math.max(.5,1.8-shakeLv*.15)}s ${got?'infinite':'0'}">${giftSVG()}</div>
+    <div class="card qcard shadow-blue"><div class="tape ${['grid','dots','green','pink','stripe'][qi%5]}"></div>
+      <div class="qn">QUESTION ${qi+1}</div><h2>${q.q}</h2>${body}</div>
+    <div style="display:flex;justify-content:space-between;margin:16px 4px 0">
+      <button class="staff-btn" style="margin:0" id="q-prev">${qi>0?'‹ 이전 질문':'‹ 스탬프 판'}</button>
+      ${q.optional?'':''}
+    </div>
+  </section>`;
+  bindTop();
+  $('#q-prev').onclick=()=>{ sfx.tap(); if(qi>0){qi--;renderQ();} else {renderHome();} };
+  app.querySelectorAll('[data-v]').forEach(el=>el.onclick=()=>{
+    let v=el.dataset.v; if(q.type==='face'||q.type==='gauge') v=+v;
+    answer(q,v,el);
+  });
+  if(q.type==='text') $('#tx-ok').onclick=()=>answer(q,$('#tx').value.trim().slice(0,100),$('#tx-ok'));
+}
+function answer(q,v,el){
+  const fresh=S.survey[q.id]===undefined;
+  S.survey[q.id]=v; save();
+  app.querySelectorAll('[data-v]').forEach(e=>e.classList.remove('sel')); el.classList&&el.classList.add('sel');
+  sfx.key(); vib(15);
+  if(fresh){ const r=el.getBoundingClientRect(); confetti(26,(r.left+r.width/2)/innerWidth,(r.top+r.height/2)/innerHeight,.55);
+    const c=document.createElement('div'); c.className='combo out'; const got=CONFIG.survey.filter(x=>S.survey[x.id]!==undefined).length;
+    c.textContent=got===CONFIG.survey.length?'열쇠 완성! 🔑':`🔑 +1  ${CHEERS[Math.min(got-1,CHEERS.length-1)]}`; document.body.appendChild(c); setTimeout(()=>c.remove(),850); }
+  setTimeout(()=>{
+    const nxt=CONFIG.survey.findIndex(x=>S.survey[x.id]===undefined);
+    if(nxt<0){ finishSurvey(); } else { qi=nxt; renderQ(); }
+  },430);
+}
+function finishSurvey(){
+  S.surveyDone=true; S.surveyAt=Date.now(); save();
+  sync({survey:S.survey,surveyAt:S.surveyAt});
+  renderGift();
+}
+
+/* ===================== GIFT ===================== */
+function renderGift(){
+  bg(''); scrollTo(0,0);
+  let left=3;
+  app.innerHTML=`${topBar()}<section class="gift">
+    <div class="stage-lbl" style="display:inline-block;background:var(--navy);color:#fff;border-radius:999px;padding:6px 14px;font-size:13px;margin-top:4px">퀘스트 클리어!</div>
+    <h1 class="out">선물상자를<br>톡톡 두드려봐!</h1>
+    <div class="tap" id="tapmsg">3번 두드리면 열려!</div>
+    <div class="rays"><button class="giftbox" id="gb" aria-label="선물상자 열기">${giftSVG()}</button>
+      <div style="position:absolute;left:8px;top:28px">${sparkle(30)}</div><div style="position:absolute;right:14px;top:60px">${sparkle(22)}</div><div style="position:absolute;right:30px;bottom:30px">${sparkle(26)}</div></div>
+    <div class="taps">${'<i></i>'.repeat(3)}</div>
+  </section>`;
+  bindTop();
+  const gb=$('#gb');
+  gb.onclick=()=>{
+    if(left<=0) return; left--;
+    gb.classList.remove('wobble'); void gb.offsetWidth; gb.classList.add('wobble');
+    tone(500+(3-left)*220,.12,'triangle',.2); vib(25*(4-left));
+    app.querySelectorAll('.taps i').forEach((e,i)=>e.classList.toggle('on',i<3-left));
+    confetti(18*(3-left),.5,.5,.5);
+    $('#tapmsg').textContent=left===2?'오! 뭔가 들어있어…':left===1?'한 번만 더!!':'';
+    if(left===0){ setTimeout(()=>{ gb.classList.add('open'); sfx.fan(); vib([100,50,300]); confetti(260,.5,.5,1.6); setTimeout(()=>confetti(140,.2,.3,1),250); setTimeout(()=>confetti(140,.8,.3,1),450);
+      if(!S.voucher){ S.voucher={code:'IJ-'+String(Math.floor(1000+Math.random()*9000)),issuedAt:Date.now(),redeemedAt:null}; save(); sync({voucherCode:S.voucher.code,issuedAt:S.voucher.issuedAt}); }
+      setTimeout(renderVoucher,900); },250); }
+  };
+}
+
+/* ===================== VOUCHER ===================== */
+function renderVoucher(){
+  bg(''); scrollTo(0,0);
+  const v=S.voucher, used=!!v.redeemedAt;
+  app.innerHTML=`${topBar()}<section class="vwrap">
+    <h1 class="out">${used?'교환 완료!':'짜잔! 교환권 등장!'}</h1>
+    <p style="margin:10px 0 0;font-size:15px;color:var(--navy)">${used?'맛있게 먹고 힐링하자 😋':'운영본부에 이 화면을 보여주고<br>교환권을 받아가!'}</p>
+    <div class="ticket ${used?'used':''}">
+      <div class="t-top"><div class="k">2026 강남구 청소년어울림마당 · IN:JOY</div>
+        <div class="big">${CONFIG.voucherUse}<small>식음료 교환권</small></div>
+        <span class="notch l"></span><span class="notch r"></span></div>
+      <div class="t-body">
+        <div class="who">${esc(S.nick)}</div>
+        <div class="code">${v.code}</div>
+        <div class="when">발급 ${hhmm(v.issuedAt)}${used?' · 교환 '+hhmm(v.redeemedAt):''}</div>
+        <div class="go">${used?'운영본부에서 교환권을 받았어요':'📍 <b style="font-weight:normal">운영본부</b>에서 이 화면을 보여주세요'}</div>
+      </div>
+      ${used?`<div class="used-mark">교환완료<small>${hhmm(v.redeemedAt)}</small></div>`:''}
+    </div>
+    ${used?'':`<button class="staff-btn" id="staff">운영본부 확인 (운영자 전용)</button>`}
+    <div class="card notes shadow-blue"><div class="tape dots"></div>
+      <h3 class="out-g" style="margin:0 0 4px;font-size:18px;text-align:center">교환권 안내</h3>
+      <ul><li>1인 1회만 지급돼요.</li><li>교환권은 ${CONFIG.voucherUse}에서 당일 ${CONFIG.voucherUntil}까지 사용할 수 있어요.</li><li>준비된 상품이 소진되면 조기 마감될 수 있어요.</li><li>남은 체험부스도 계속 즐길 수 있어요!</li></ul>
+    </div>
+    <div style="margin:20px 4px 0"><button class="btn white" id="v-home" style="height:52px;font-size:16px">‹ 스탬프 판으로</button></div>
+    <div class="chars"><img src="assets/charL.webp" alt=""><img src="assets/charR.webp" alt=""></div>
+  </section>`;
+  bindTop();
+  $('#v-home').onclick=()=>{ sfx.tap(); renderHome(); scrollTo(0,0); };
+  const st=$('#staff'); if(st) st.onclick=staffPin;
+}
+function staffPin(){
+  let pin='';
+  const sc=document.createElement('div'); sc.className='scrim center';
+  let drawn=false;
+  const draw=()=>{ sc.innerHTML=`<div class="modal ${drawn?'still':''}" style="padding-top:24px"><button class="icon-btn x" style="position:absolute;right:12px;top:12px">${X}</button>
+    <h2 style="font-size:20px;color:var(--navy);margin:4px 0 0">운영자 확인</h2><p class="tiny" style="margin-top:6px">교환권을 지급한 뒤 운영자 PIN을 입력하세요.<br>입력하면 '교환완료'로 바뀌어 재사용할 수 없어요.</p>
+    <div class="pin">${[0,1,2,3].map(i=>`<i class="${pin[i]?'on':''}"></i>`).join('')}</div>
+    <div class="pad">${[1,2,3,4,5,6,7,8,9,'C',0,'←'].map(k=>`<button data-k="${k}">${k}</button>`).join('')}</div></div>`;
+    drawn=true; sc.querySelector('.x').onclick=()=>sc.remove();
+    sc.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; sfx.tap();
+      if(k==='C') pin=''; else if(k==='←') pin=pin.slice(0,-1); else if(pin.length<4) pin+=k;
+      draw();
+      if(pin.length===4){ if(pin===CONFIG.staffPin){ S.voucher.redeemedAt=Date.now(); save(); sync({redeemedAt:S.voucher.redeemedAt}); sc.remove(); sfx.stamp(); vib(120); renderVoucher(); }
+        else { sfx.no(); vib([60,40,60]); const m=sc.querySelector('.modal'); m.classList.add('shake'); setTimeout(()=>{pin='';draw();},500); } } }); };
+  draw(); document.body.appendChild(sc);
+}
+
+/* ===================== boot ===================== */
+function route(){
+  if(!S.id) return renderIntro();
+  renderHome();
+}
+route(); initFB();
+</script>
+</body>
+</html>
