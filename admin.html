@@ -51,7 +51,14 @@ button.primary{background:var(--blue);color:#fff}
 <main id="main"></main>
 <script type="module">
 /* index.html 과 같은 Firebase 설정을 넣어주세요 (README 참고) */
-const FIREBASE = null;
+const FIREBASE = {
+    apiKey: "AIzaSyBK_E7h9v-kYR1pzyIgNn5dDKLrNzVZigo",
+    authDomain: "injoy-stamp-tou.firebaseapp.com",
+    projectId: "injoy-stamp-tou",
+    storageBucket: "injoy-stamp-tou.firebasestorage.app",
+    messagingSenderId: "502221484945",
+    appId: "1:502221484945:web:b1cecf2c40cbf01f2ee030"
+};
 const GOAL = 4;
 const BOOTHS=[['b1','볼꾸 힐링타임','#F27BA6'],['b2','거북이 키링','#2FA58F'],['b3','농구왕 도전','#F7941D'],['b4','꿈꾸는 쿠키공방','#C98A4B'],['b5','AI 마음자판기','#5BB8EE'],['b6','아로마 롤온','#9B7FD6'],['b7','잠시 멈춤 OFF','#1F4A86']];
 const BN=Object.fromEntries(BOOTHS.map(b=>[b[0],b[1]]));
@@ -145,7 +152,7 @@ async function boot(){
     F.onSnapshot(F.collection(db,'participants'),snap=>{ rows=snap.docs.map(d=>({id:d.id,...d.data()})); render(); });
   });
 }
-boot();
+boot().catch(e=>{ main.innerHTML=`<div class="login"><h2 style="margin:0;color:var(--navy)">연결 실패</h2><p class="note">Firebase에 연결하지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.<br><small>${esc(e.message||e)}</small></p></div>`; });
 </script>
 </body>
 </html>

@@ -285,7 +285,14 @@ const CONFIG = {
   voucherUse: 'CHILL 힐링존',
   voucherUntil: '16:30',
   // Firebase 웹앱 설정 (README 참고). 비워두면 기기 저장만 하는 '로컬 모드'로 동작
-  firebase: null,
+  firebase: {
+    apiKey: "AIzaSyBK_E7h9v-kYR1pzyIgNn5dDKLrNzVZigo",
+    authDomain: "injoy-stamp-tou.firebaseapp.com",
+    projectId: "injoy-stamp-tou",
+    storageBucket: "injoy-stamp-tou.firebasestorage.app",
+    messagingSenderId: "502221484945",
+    appId: "1:502221484945:web:b1cecf2c40cbf01f2ee030"
+  },
   booths: [
     { id:'b1', host:'청운위', name:'청운위의 볼꾸 힐링타임', short:'볼꾸 힐링타임', icon:'face', c:'#F27BA6', cl:'#FDDDE8', cd:'#D94F82',
       line:'오늘 기분, 내가 ○○!', answer:['꾸','며'], tiles:['꾸','며','봐','그','려','줘'] },
