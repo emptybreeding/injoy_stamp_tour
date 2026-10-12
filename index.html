@@ -216,6 +216,10 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
 .bat{flex:0 0 74px;height:30px;border:3px solid var(--ink);border-radius:8px;position:relative;padding:3px;display:flex;gap:3px;background:#fff}
 .bat::after{content:"";position:absolute;right:-8px;top:7px;width:5px;height:10px;background:var(--ink);border-radius:0 3px 3px 0}
 .bat u{flex:1;border-radius:3px;background:#E4E8F0}
+.chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:16px}
+.chip{border:2.5px solid var(--ink);border-radius:999px;padding:7px 12px;font-size:14px;background:#fff;color:var(--navy);transition:transform .08s,background .15s}
+.chip:active{transform:scale(.94)}
+.chip.sel{background:#FFD43B}
 .textq textarea{width:100%;height:110px;border-radius:16px;border:3px solid var(--ink);padding:14px;font-size:17px;font-family:inherit;background:#FFFBE0;resize:none;outline:none;margin-top:18px;color:var(--navy)}
 .combo{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:85;pointer-events:none;font-size:34px;white-space:nowrap;animation:combo .8s ease-out forwards}
 @keyframes combo{0%{transform:translate(-50%,-30%) scale(.4);opacity:0}30%{transform:translate(-50%,-50%) scale(1.15);opacity:1}100%{transform:translate(-50%,-120%) scale(1);opacity:0}}
@@ -281,7 +285,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
 const CONFIG = {
   goal: 4,                       // 교환권 받을 수 있는 인증 개수
   staffPin: '1017',              // 운영본부 '교환 완료' 확인용 PIN (행사 전 변경 권장)
-  experienceTime: '13:00 ~ 14:30',
+  experienceTime: '13:00 ~ 14:50',
   voucherUse: 'CHILL 힐링존',
   voucherUntil: '16:30',
   // Firebase 웹앱 설정 (README 참고). 비워두면 기기 저장만 하는 '로컬 모드'로 동작
@@ -306,18 +310,21 @@ const CONFIG = {
       line:'내 마음을 ○○줘!', answer:['읽','어'], tiles:['읽','어','알','봐','들','줘'] },
     { id:'b6', host:'아로마', name:'힐링 아로마 롤온 만들기', short:'아로마 롤온', icon:'roll', c:'#9B7FD6', cl:'#E8E0F7', cd:'#7A5CC0',
       line:'향기로 기분 ○', answer:['RESET'], tiles:['RESET','RELAX','CHARGE','REPLAY'] },
-    { id:'b7', host:'강남청소년센터', name:"디지털 안전캠페인 '잠시 멈춤 OFF'", short:'잠시 멈춤 OFF', icon:'phone', c:'#1F4A86', cl:'#DCE5F3', cd:'#1F4A86',
-      line:"디지털 안전캠페인 '잠시 ○○ OFF'", answer:['멈','춤'], tiles:['멈','춤','정','지','휴','식'] },
+    { id:'b7', host:'역삼청소년센터', name:"디지털 안전캠페인 '잠시 멈춤 OFF'", short:'잠시 멈춤 OFF', icon:'phone', c:'#1F4A86', cl:'#DCE5F3', cd:'#1F4A86',
+      line:'역삼청소년센터가 ○○하는 디지털 안전캠페인', answer:['함','께'], tiles:['함','께','같','이','응','원'] },
   ],
   survey: [
     { id:'overall', type:'face',  q:'오늘 IN:JOY,<br>한마디로 어땠어?' },
     { id:'best',    type:'booth', q:'제일 재밌었던<br>체험은 뭐야?' },
     { id:'before',  type:'gauge', q:'축제 오기 전,<br>내 스트레스 게이지는?' },
+    { id:'worry',   type:'text',  q:'요즘 나의 마음을<br>가장 힘들게 하는 건 뭐야?', required:true, max:150,
+      chips:['성적·학업','진로 고민','친구 관계','가족 관계','외모 고민','SNS·온라인 관계','스트레스','외로움'],
+      placeholder:'편하게 적어줘! 위 예시를 눌러도 되고, 직접 써도 돼' },
     { id:'after',   type:'gauge', q:'그럼 지금!<br>내 스트레스 게이지는?' },
     { id:'again',   type:'pick',  q:'다음 어울림마당에도<br>또 올 거야?', opts:['무조건 와!','아마 올 듯','글쎄…','잘 모르겠어'] },
     { id:'channel', type:'pick',  q:'이 축제,<br>어떻게 알고 왔어?', opts:['학교 안내','청소년센터','SNS','친구·가족','지나가다 우연히','기타'], two:true },
     { id:'grade',   type:'pick',  q:'나는 지금…', opts:['초등학생','중학생','고등학생','그 외'], two:true },
-    { id:'comment', type:'text',  q:'마지막!<br>축제에 한마디 남겨줘', optional:true },
+    { id:'comment', type:'text',  q:'마지막!<br>축제에 한마디 남겨줘', optional:true, max:100, placeholder:'재밌었던 점, 아쉬웠던 점 뭐든 좋아! (안 써도 돼)' },
   ]
 };
 
@@ -633,8 +640,11 @@ function renderQ(){
   if(q.type==='pick') body=`<div class="opts ${q.two?'two':''}">${q.opts.map(o=>`<button class="opt ${S.survey[q.id]===o?'sel':''}" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
   if(q.type==='gauge'){ const L=[[5,'꽉 찼어 (완전 많음)','#E2457A'],[4,'많은 편','#F7941D'],[3,'보통','#FFD43B'],[2,'조금','#8DC63F'],[1,'거의 없음','#5BB8EE']];
     body=`<div class="gauge">${L.map(([v,t,c])=>`<button class="opt ${S.survey[q.id]===v?'sel':''}" data-v="${v}"><span class="bat">${[1,2,3,4,5].map(k=>`<u style="${k<=v?'background:'+c:''}"></u>`).join('')}</span><span>${t}</span></button>`).join('')}</div>`; }
-  if(q.type==='text') body=`<div class="textq"><textarea id="tx" maxlength="100" placeholder="재밌었던 점, 아쉬웠던 점 뭐든 좋아! (안 써도 돼)">${esc(S.survey[q.id]||'')}</textarea></div>
-    <div style="display:grid;gap:10px;margin-top:14px"><button class="btn pink" id="tx-ok">열쇠 받고 선물상자 열기 🔑</button></div>`;
+  if(q.type==='text'){ const last=CONFIG.survey.filter(x=>S.survey[x.id]===undefined&&x.id!==q.id).length===0;
+    body=`${q.chips?`<div class="chips">${q.chips.map(c=>`<button class="chip" data-chip="${esc(c)}">${esc(c)}</button>`).join('')}</div>`:''}
+    <div class="textq"><textarea id="tx" maxlength="${q.max||100}" placeholder="${esc(q.placeholder||'')}">${esc(S.survey[q.id]||'')}</textarea></div>
+    <div class="feedback no" id="txfb" style="height:auto;min-height:0;margin-top:6px"></div>
+    <div style="display:grid;gap:10px;margin-top:10px"><button class="btn pink" id="tx-ok">${last?'열쇠 받고 선물상자 열기 🔑':'열쇠 받기 🔑'}</button></div>`; }
   app.innerHTML=`${topBar()}<section class="sv">
     <div class="stage-lbl">FINAL QUEST · 열쇠 ${got} / ${N}</div>
     <div class="keys">${CONFIG.survey.map(x=>`<i class="${S.survey[x.id]!==undefined?'on':''}">${KEYSVG}</i>`).join('')}</div>
@@ -652,7 +662,18 @@ function renderQ(){
     let v=el.dataset.v; if(q.type==='face'||q.type==='gauge') v=+v;
     answer(q,v,el);
   });
-  if(q.type==='text') $('#tx-ok').onclick=()=>answer(q,$('#tx').value.trim().slice(0,100),$('#tx-ok'));
+  if(q.type==='text'){
+    const tx=$('#tx');
+    const syncChips=()=>app.querySelectorAll('.chip').forEach(c=>c.classList.toggle('sel',tx.value.includes(c.dataset.chip)));
+    app.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{ sfx.tap(); const v=c.dataset.chip;
+      if(tx.value.includes(v)) tx.value=tx.value.replace(new RegExp('(,\\s*)?'+v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')),'').replace(/^,\s*/,'');
+      else tx.value=(tx.value.trim()?tx.value.trim()+', ':'')+v;
+      syncChips(); });
+    tx.oninput=()=>{ syncChips(); const f=$('#txfb'); if(f) f.textContent=''; }; syncChips();
+    $('#tx-ok').onclick=()=>{ const v=tx.value.trim().slice(0,q.max||100);
+      if(q.required&&v.length<2){ sfx.no(); vib([50,30,50]); const c=app.querySelector('.qcard'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); $('#txfb').textContent='한 줄만 적어줘! 예시를 눌러도 돼'; tx.focus(); return; }
+      answer(q,v,$('#tx-ok')); };
+  }
 }
 function answer(q,v,el){
   const fresh=S.survey[q.id]===undefined;

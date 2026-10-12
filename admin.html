@@ -94,6 +94,12 @@ function render(){
     const extra=type==='face'?`<span class="big" style="float:right">${avg(ov).toFixed(2)}<small style="font-size:13px;color:var(--muted)"> / 5</small></span>`:'';
     return `<div class="panel"><h2>${label}<small>응답 ${vals.length}</small>${extra}</h2>${bars(items,vals.length,'#F27BA6')}</div>`;
   }).join('');
+  const WK=[['성적·학업',['성적','학업','공부','시험','학원','숙제','수행']],['진로 고민',['진로','미래','꿈','대학','입시']],['친구 관계',['친구']],['가족 관계',['가족','부모','엄마','아빠','형제','동생','언니','오빠','누나','형']],['외모 고민',['외모','얼굴','몸무게','살','키']],['SNS·온라인 관계',['SNS','sns','온라인','인스타','카톡','단톡','게임']],['스트레스',['스트레스']],['외로움',['외로','혼자']]];
+  const wr=rows.filter(r=>r.survey&&r.survey.worry);
+  const wItems=WK.map(([t,ks])=>[t,wr.filter(r=>ks.some(k=>r.survey.worry.includes(k))).length]);
+  wItems.push(['기타(위 항목 외)',wr.filter(r=>!WK.some(([,ks])=>ks.some(k=>r.survey.worry.includes(k)))).length,'#9AA3B5']);
+  const worryPanel=`<div class="panel"><h2>요즘 마음을 힘들게 하는 것 <small>응답 ${wr.length} · 키워드 자동 분류(중복 포함)</small></h2>${bars(wItems,wr.length,'#9B7FD6')}
+    <div class="cmts" style="margin-top:12px;max-height:240px">${wr.sort((a,b)=>(b.surveyAt||0)-(a.surveyAt||0)).map(r=>`<div class="cmt" style="background:#EFE9FA"><b>${esc(r.nick)}</b>${esc(r.survey.worry)}</div>`).join('')||'<p class="note">아직 없어요</p>'}</div></div>`;
   const cm=rows.filter(r=>r.survey&&r.survey.comment).sort((a,b)=>(b.surveyAt||0)-(a.surveyAt||0));
   main.innerHTML=`
   <div class="kpis">
@@ -111,6 +117,7 @@ function render(){
       <div><div class="lbl">감소율</div><div class="big" style="color:#2FA58F">${drop>0?'▼ '+drop.toFixed(1)+'%':'-'}</div></div></div>
       <p class="note">결과보고서용 성과지표: "참여 후 스트레스 지수 ${drop>0?drop.toFixed(1)+'% 감소':'(데이터 수집 중)'}"</p></div>
     ${qPanels}
+    ${worryPanel}
     <div class="panel"><h2>한마디 <small>${cm.length}건</small></h2><div class="cmts">${cm.map(r=>`<div class="cmt"><b>${esc(r.nick)} · ${r.surveyAt?new Date(r.surveyAt).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):''}</b>${esc(r.survey.comment)}</div>`).join('')||'<p class="note">아직 없어요</p>'}</div></div>
   </div>
   <div class="tools"><button class="primary" id="csv">CSV 다운로드 (엑셀용)</button>${FIREBASE?'':'<button id="demo">데모 데이터 보기</button><button id="clear">데모 지우기</button>'}</div>
@@ -119,10 +126,10 @@ function render(){
   if(!FIREBASE){ $('#demo').onclick=()=>{rows=demo(140);render();}; $('#clear').onclick=()=>{rows=localRows();render();}; }
 }
 function csv(){
-  const head=['id','닉네임','스탬프수',...BOOTHS.map(b=>b[1]),...Q.map(q=>q[1]),'한마디','교환권번호','발급','교환'];
+  const head=['id','닉네임','스탬프수',...BOOTHS.map(b=>b[1]),...Q.map(q=>q[1]),'마음을 힘들게 하는 것','한마디','교환권번호','발급','교환'];
   const t=v=>v?new Date(v).toLocaleString('ko-KR'):'';
   const lines=[head,...rows.map(r=>{ const s=r.survey||{}; return [r.id,r.nick,r.stampCount||0,...BOOTHS.map(b=>r.stamps&&r.stamps[b[0]]?t(r.stamps[b[0]]):''),
-    ...Q.map(([id,,type,,lab])=>type==='booth'?(BN[s[id]]||''):(lab&&s[id]?lab[s[id]]:(s[id]??''))),s.comment||'',r.voucherCode||'',t(r.issuedAt),t(r.redeemedAt)]; })];
+    ...Q.map(([id,,type,,lab])=>type==='booth'?(BN[s[id]]||''):(lab&&s[id]?lab[s[id]]:(s[id]??''))),s.worry||'',s.comment||'',r.voucherCode||'',t(r.issuedAt),t(r.redeemedAt)]; })];
   const body='﻿'+lines.map(l=>l.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([body],{type:'text/csv'})); a.download='injoy_stamp_tour.csv'; a.click();
 }
@@ -133,7 +140,7 @@ function demo(n){
     const ids=[...BOOTHS].sort(()=>Math.random()-.5).slice(0,k).map(b=>b[0]); const stamps={}; ids.forEach(id=>stamps[id]=Date.now()-Math.random()*5e6);
     const o={id:'demo'+i,nick:pick(names)+i,stamps,stampCount:k};
     if(k>=GOAL&&Math.random()<.9){ const b=3+Math.floor(Math.random()*3); o.surveyDone=true; o.surveyAt=Date.now()-Math.random()*3e6;
-      o.survey={overall:pick([3,4,4,5,5,5]),best:pick(ids),before:b,after:Math.max(1,b-1-Math.floor(Math.random()*2)),again:pick(['무조건 와!','무조건 와!','아마 올 듯','글쎄…']),channel:pick(['학교 안내','청소년센터','SNS','친구·가족','지나가다 우연히']),grade:pick(['초등학생','중학생','중학생','고등학생']),comment:Math.random()<.3?pick(['쿠키 너무 맛있어요!','농구 또 하고 싶어요','내년에도 해주세요','줄이 좀 길었어요','AI 자판기 신기했어요']):''};
+      o.survey={overall:pick([3,4,4,5,5,5]),best:pick(ids),before:b,after:Math.max(1,b-1-Math.floor(Math.random()*2)),again:pick(['무조건 와!','무조건 와!','아마 올 듯','글쎄…']),channel:pick(['학교 안내','청소년센터','SNS','친구·가족','지나가다 우연히']),grade:pick(['초등학생','중학생','중학생','고등학생']),worry:pick(['시험 성적','진로 고민, 스트레스','친구 관계','학원 숙제가 너무 많아요','가족 관계','외모 고민','SNS·온라인 관계','외로움','딱히 없어요']),comment:Math.random()<.3?pick(['쿠키 너무 맛있어요!','농구 또 하고 싶어요','내년에도 해주세요','줄이 좀 길었어요','AI 자판기 신기했어요']):''};
       o.voucherCode='IJ-'+(1000+i); o.issuedAt=o.surveyAt; if(Math.random()<.85) o.redeemedAt=o.surveyAt+6e5; }
     r.push(o); }
   return r;
