@@ -42,6 +42,13 @@ button.primary{background:var(--blue);color:#fff}
 .note{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5}
 .err{color:#E2457A;font-size:13px;margin-top:8px;min-height:18px}
 .prepost{display:flex;gap:16px;align-items:flex-end;margin-top:6px}
+.lt{width:100%;border-collapse:collapse;font-size:13px}.lt th{text-align:left;color:var(--muted);font-weight:normal;padding:6px 8px;border-bottom:2px solid #EEF1F6;position:sticky;top:0;background:#fff}.lt td{padding:6px 8px;border-bottom:1px solid #F1F3F7;font-variant-numeric:tabular-nums}.lt tr.won td{background:#FFE9B8}
+#ov{position:fixed;inset:0;background:rgba(20,30,60,.55);display:grid;place-items:center;z-index:50;padding:16px}
+.ovbox{background:#fff;border:3px solid var(--ink);border-radius:22px;padding:24px;max-width:460px;width:100%;text-align:center;box-shadow:6px 7px 0 var(--orange)}
+.draw-no{font-size:72px;color:var(--navy);margin:18px 0 4px;font-variant-numeric:tabular-nums}
+.draw-nick{font-size:22px;color:var(--pink);min-height:30px}
+.rsin{width:100%;height:46px;border-radius:12px;border:2.5px solid var(--ink);padding:0 12px;font-size:16px;font-family:inherit;margin-top:8px;text-align:center}
+button[disabled]{opacity:.45;cursor:not-allowed}
 .prepost div{flex:1;text-align:center}
 .prepost .lbl{font-size:12px;color:var(--muted)}
 </style>
@@ -73,7 +80,10 @@ const Q=[
 ];
 const $=s=>document.querySelector(s); const main=$('#main');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let rows=[];
+let rows=[]; let FB=null; // {db,F}
+const DRAWN_KEY='injoy_drawn_v1';
+const getDrawn=()=>{ try{return JSON.parse(localStorage.getItem(DRAWN_KEY))||[]}catch(e){return []} };
+const setDrawn=a=>{ try{localStorage.setItem(DRAWN_KEY,JSON.stringify(a))}catch(e){} };
 
 function bars(items,total,color){ const max=Math.max(1,...items.map(i=>i[1]));
   return items.map(([t,n,c])=>`<div class="bar"><span class="t" title="${esc(t)}">${esc(t)}</span><div class="track"><div class="fill" style="width:${n/max*100}%;--c:${c||color}"></div></div><span class="n">${n} <small>${total?Math.round(n/total*100):0}%</small></span></div>`).join(''); }
@@ -81,7 +91,7 @@ const avg=a=>a.length?(a.reduce((x,y)=>x+y,0)/a.length):0;
 
 function render(){
   const P=rows.length, elig=rows.filter(r=>(r.stampCount||0)>=GOAL).length, sv=rows.filter(r=>r.surveyDone).length,
-    iss=rows.filter(r=>r.voucherCode).length, red=rows.filter(r=>r.redeemedAt).length;
+    iss=rows.filter(r=>r.voucherNo).length, red=rows.filter(r=>r.redeemedAt).length;
   const S=rows.filter(r=>r.survey).map(r=>r.survey);
   const booth=BOOTHS.map(([id,n,c])=>[n,rows.filter(r=>r.stamps&&r.stamps[id]).length,c]);
   const dist=[0,1,2,3,4,5,6,7].map(k=>[k+'개',rows.filter(r=>(r.stampCount||0)===k).length,k>=GOAL?'#8DC63F':'#ACDBF5']);
@@ -101,6 +111,12 @@ function render(){
   const worryPanel=`<div class="panel"><h2>요즘 마음을 힘들게 하는 것 <small>응답 ${wr.length} · 키워드 자동 분류(중복 포함)</small></h2>${bars(wItems,wr.length,'#9B7FD6')}
     <div class="cmts" style="margin-top:12px;max-height:240px">${wr.sort((a,b)=>(b.surveyAt||0)-(a.surveyAt||0)).map(r=>`<div class="cmt" style="background:#EFE9FA"><b>${esc(r.nick)}</b>${esc(r.survey.worry)}</div>`).join('')||'<p class="note">아직 없어요</p>'}</div></div>`;
   const cm=rows.filter(r=>r.survey&&r.survey.comment).sort((a,b)=>(b.surveyAt||0)-(a.surveyAt||0));
+  const lucky=rows.filter(r=>r.voucherNo).sort((a,b)=>a.voucherNo-b.voucherNo);
+  const drawn=getDrawn();
+  const luckyPanel=`<div class="panel"><h2>럭키드로우 번호 목록 <small>${lucky.length}명 · 발급 순</small></h2>
+    <div style="max-height:320px;overflow:auto"><table class="lt"><thead><tr><th>번호</th><th>닉네임</th><th>발급</th><th>교환</th></tr></thead><tbody>
+    ${lucky.map(r=>`<tr class="${drawn.includes(r.voucherNo)?'won':''}"><td>No.${String(r.voucherNo).padStart(3,'0')}</td><td>${esc(r.nick)}</td><td>${r.issuedAt?new Date(r.issuedAt).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):''}</td><td>${r.redeemedAt?'✓':''}</td></tr>`).join('')||'<tr><td colspan="4" class="note">아직 없어요</td></tr>'}
+    </tbody></table></div>${drawn.length?`<p class="note">당첨 처리된 번호: ${drawn.map(n=>'No.'+String(n).padStart(3,'0')).join(', ')}</p>`:''}</div>`;
   main.innerHTML=`
   <div class="kpis">
     <div class="kpi" style="--c:var(--blue)"><div class="l">참여자</div><div class="v">${P}</div><div class="s">닉네임 등록 기준</div></div>
@@ -116,24 +132,60 @@ function render(){
       <div class="prepost"><div><div class="lbl">축제 전</div><div class="big">${avg(pre).toFixed(2)}</div></div><div style="flex:0;font-size:24px;padding-bottom:4px">→</div><div><div class="lbl">축제 후</div><div class="big">${avg(post).toFixed(2)}</div></div>
       <div><div class="lbl">감소율</div><div class="big" style="color:#2FA58F">${drop>0?'▼ '+drop.toFixed(1)+'%':'-'}</div></div></div>
       <p class="note">결과보고서용 성과지표: "참여 후 스트레스 지수 ${drop>0?drop.toFixed(1)+'% 감소':'(데이터 수집 중)'}"</p></div>
+    ${luckyPanel}
     ${qPanels}
     ${worryPanel}
     <div class="panel"><h2>한마디 <small>${cm.length}건</small></h2><div class="cmts">${cm.map(r=>`<div class="cmt"><b>${esc(r.nick)} · ${r.surveyAt?new Date(r.surveyAt).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):''}</b>${esc(r.survey.comment)}</div>`).join('')||'<p class="note">아직 없어요</p>'}</div></div>
   </div>
-  <div class="tools"><button class="primary" id="csv">CSV 다운로드 (엑셀용)</button>${FIREBASE?'':'<button id="demo">데모 데이터 보기</button><button id="clear">데모 지우기</button>'}</div>
+  <div class="tools"><button class="primary" id="draw" style="background:var(--orange)">🎁 럭키드로우 추첨</button><button class="primary" id="csv">CSV 다운로드 (엑셀용)</button>${FIREBASE?'<button id="reset" style="margin-left:auto;color:#E2457A;border-color:#E2457A;box-shadow:0 3px 0 #E2457A">기록 전체 초기화</button>':''}${FIREBASE?'':'<button id="demo">데모 데이터 보기</button><button id="clear">데모 지우기</button>'}</div>
   <p class="note">마지막 갱신 ${new Date().toLocaleTimeString('ko-KR')} ${FIREBASE?'· 실시간 자동 갱신 중':'· 로컬 모드: Firebase 설정 전에는 이 기기에서 참여한 기록과 데모 데이터만 보여요.'}</p>`;
-  $('#csv').onclick=csv;
-  if(!FIREBASE){ $('#demo').onclick=()=>{rows=demo(140);render();}; $('#clear').onclick=()=>{rows=localRows();render();}; }
+  $('#csv').onclick=csv; $('#draw').onclick=openDraw; const rs=$('#reset'); if(rs) rs.onclick=openReset;
+  if(!FIREBASE){ $('#demo').onclick=()=>{rows=demoNumber(demo(140));render();}; $('#clear').onclick=()=>{rows=localRows();render();}; }
 }
 function csv(){
-  const head=['id','닉네임','스탬프수',...BOOTHS.map(b=>b[1]),...Q.map(q=>q[1]),'마음을 힘들게 하는 것','한마디','교환권번호','발급','교환'];
+  const head=['id','닉네임','스탬프수',...BOOTHS.map(b=>b[1]),...Q.map(q=>q[1]),'마음을 힘들게 하는 것','한마디','럭키드로우번호','발급','교환'];
   const t=v=>v?new Date(v).toLocaleString('ko-KR'):'';
   const lines=[head,...rows.map(r=>{ const s=r.survey||{}; return [r.id,r.nick,r.stampCount||0,...BOOTHS.map(b=>r.stamps&&r.stamps[b[0]]?t(r.stamps[b[0]]):''),
-    ...Q.map(([id,,type,,lab])=>type==='booth'?(BN[s[id]]||''):(lab&&s[id]?lab[s[id]]:(s[id]??''))),s.worry||'',s.comment||'',r.voucherCode||'',t(r.issuedAt),t(r.redeemedAt)]; })];
+    ...Q.map(([id,,type,,lab])=>type==='booth'?(BN[s[id]]||''):(lab&&s[id]?lab[s[id]]:(s[id]??''))),s.worry||'',s.comment||'',r.voucherNo?'No.'+String(r.voucherNo).padStart(3,'0'):'',t(r.issuedAt),t(r.redeemedAt)]; })];
   const body='﻿'+lines.map(l=>l.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([body],{type:'text/csv'})); a.download='injoy_stamp_tour.csv'; a.click();
 }
-function localRows(){ try{ const v=JSON.parse(localStorage.getItem('injoy2026_v1')); if(v&&v.id) return [{...v,stampCount:Object.keys(v.stamps||{}).length,voucherCode:v.voucher?.code,issuedAt:v.voucher?.issuedAt,redeemedAt:v.voucher?.redeemedAt}]; }catch(e){} return []; }
+function demoNumber(r){ const L=r.filter(o=>o.issuedAt).sort((a,b)=>a.issuedAt-b.issuedAt); L.forEach((o,i)=>o.voucherNo=i+1); return r; }
+function overlay(html){ let o=$('#ov'); if(!o){ o=document.createElement('div'); o.id='ov'; document.body.appendChild(o);} o.innerHTML=`<div class="ovbox">${html}</div>`; o.hidden=false; o.onclick=e=>{ if(e.target===o) o.hidden=true; }; return o; }
+function openDraw(){
+  const pool=()=>rows.filter(r=>r.voucherNo&&!getDrawn().includes(r.voucherNo));
+  const show=(res)=>{
+    const p=pool();
+    const o=overlay(`<h2 style="margin:0;color:var(--navy)">🎁 럭키드로우</h2>
+      <div class="draw-no" id="dn">${res?'No.'+String(res.voucherNo).padStart(3,'0'):'No.???'}</div>
+      <div class="draw-nick" id="dk">${res?esc(res.nick):`추첨 대상 ${p.length}명`}</div>
+      <div class="tools" style="justify-content:center"><button class="primary" id="go" style="background:var(--orange)" ${p.length?'':'disabled'}>${res?'한 명 더 추첨':'추첨 시작'}</button><button id="cl">닫기</button></div>
+      <p class="note">교환권(럭키드로우 번호)을 받은 참여자 중에서 뽑아요. 이미 당첨된 번호는 다시 나오지 않아요.${getDrawn().length?` <a href="#" id="undo">당첨 기록 비우기</a>`:''}</p>`);
+    $('#cl').onclick=()=>{o.hidden=true; render();};
+    const u=$('#undo'); if(u) u.onclick=e=>{e.preventDefault(); setDrawn([]); show(null);};
+    $('#go').onclick=()=>{ const P=pool(); if(!P.length) return; $('#go').disabled=true;
+      const win=P[Math.floor(Math.random()*P.length)]; let t=0; const all=rows.filter(r=>r.voucherNo);
+      const iv=setInterval(()=>{ const r=all[Math.floor(Math.random()*all.length)]; $('#dn').textContent='No.'+String(r.voucherNo).padStart(3,'0'); $('#dk').textContent='두구두구두구…'; if((t+=70)>=2400){ clearInterval(iv); setDrawn([...getDrawn(),win.voucherNo]); show(win); } },70); };
+  };
+  show(null);
+}
+function openReset(){
+  const o=overlay(`<h2 style="margin:0;color:#E2457A">기록 전체 초기화</h2>
+    <p class="note" style="font-size:14px;color:var(--ink)">참여자 기록 <b>${rows.length}건</b>과 럭키드로우 번호 카운터를 모두 지워요. <b>되돌릴 수 없어요.</b><br>필요하면 먼저 CSV를 받아두세요. 진행하려면 아래에 <b>초기화</b>라고 입력하세요.</p>
+    <input id="rsin" class="rsin" placeholder="초기화" autocomplete="off">
+    <div class="err" id="rser"></div>
+    <div class="tools" style="justify-content:center"><button id="rsgo" disabled style="background:#E2457A;color:#fff">전부 지우기</button><button id="rscl">취소</button></div>`);
+  $('#rscl').onclick=()=>o.hidden=true;
+  $('#rsin').oninput=e=>$('#rsgo').disabled=e.target.value.trim()!=='초기화';
+  $('#rsgo').onclick=async()=>{ const b=$('#rsgo'); b.disabled=true; $('#rscl').disabled=true;
+    try{ const {db,F}=FB; const snap=await F.getDocs(F.collection(db,'participants')); const docs=snap.docs; let done=0;
+      for(let i=0;i<docs.length;i+=400){ const wb=F.writeBatch(db); docs.slice(i,i+400).forEach(d=>wb.delete(d.ref)); await wb.commit(); done+=Math.min(400,docs.length-i); b.textContent=`지우는 중… ${done}/${docs.length}`; }
+      await F.deleteDoc(F.doc(db,'meta','counter')); setDrawn([]);
+      o.querySelector('.ovbox').innerHTML=`<h2 style="margin:0;color:var(--navy)">초기화 완료</h2><p class="note" style="font-size:14px">참여자 기록 ${docs.length}건을 지웠고, 럭키드로우 번호는 다음 참여자부터 No.001로 시작해요.<br><b>테스트에 쓴 휴대폰</b>은 참여자 주소 뒤에 <b>#reset</b>을 붙여 한 번 열어 기록을 지워주세요.</p><div class="tools" style="justify-content:center"><button class="primary" id="ok">확인</button></div>`;
+      $('#ok').onclick=()=>o.hidden=true;
+    }catch(e){ $('#rser').textContent='실패: '+(e.code||e.message)+' — Firebase 규칙이 최신인지 확인하세요 (README 참고)'; b.disabled=false; $('#rscl').disabled=false; } };
+}
+function localRows(){ try{ const v=JSON.parse(localStorage.getItem('injoy2026_v1')); if(v&&v.id) return [{...v,stampCount:Object.keys(v.stamps||{}).length,voucherNo:v.voucher?.no,issuedAt:v.voucher?.issuedAt,redeemedAt:v.voucher?.redeemedAt}]; }catch(e){} return []; }
 function demo(n){
   const r=[],pick=a=>a[Math.floor(Math.random()*a.length)],names=['하늘','별빛','민트초코','농구왕','쿠키몬','IN조이','강남러','토끼','고양이','도레미'];
   for(let i=0;i<n;i++){ const k=Math.min(7,Math.max(0,Math.round(2+Math.random()*4+(Math.random()<.2?-2:0))));
@@ -141,7 +193,7 @@ function demo(n){
     const o={id:'demo'+i,nick:pick(names)+i,stamps,stampCount:k};
     if(k>=GOAL&&Math.random()<.9){ const b=3+Math.floor(Math.random()*3); o.surveyDone=true; o.surveyAt=Date.now()-Math.random()*3e6;
       o.survey={overall:pick([3,4,4,5,5,5]),best:pick(ids),before:b,after:Math.max(1,b-1-Math.floor(Math.random()*2)),again:pick(['무조건 와!','무조건 와!','아마 올 듯','글쎄…']),channel:pick(['학교 안내','청소년센터','SNS','친구·가족','지나가다 우연히']),grade:pick(['초등학생','중학생','중학생','고등학생']),worry:pick(['시험 성적','진로 고민, 스트레스','친구 관계','학원 숙제가 너무 많아요','가족 관계','외모 고민','SNS·온라인 관계','외로움','딱히 없어요']),comment:Math.random()<.3?pick(['쿠키 너무 맛있어요!','농구 또 하고 싶어요','내년에도 해주세요','줄이 좀 길었어요','AI 자판기 신기했어요']):''};
-      o.voucherCode='IJ-'+(1000+i); o.issuedAt=o.surveyAt; if(Math.random()<.85) o.redeemedAt=o.surveyAt+6e5; }
+      o.issuedAt=o.surveyAt; if(Math.random()<.85) o.redeemedAt=o.surveyAt+6e5; }
     r.push(o); }
   return r;
 }
@@ -152,7 +204,7 @@ async function boot(){
   const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
   const AU=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
   const F=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-  const app=A.initializeApp(FIREBASE), auth=AU.getAuth(app), db=F.getFirestore(app);
+  const app=A.initializeApp(FIREBASE), auth=AU.getAuth(app), db=F.getFirestore(app); FB={db,F};
   AU.onAuthStateChanged(auth,u=>{
     if(!u){ main.innerHTML=`<div class="login"><h2 style="margin:0;color:var(--navy)">운영자 로그인</h2><input id="em" type="email" placeholder="이메일"><input id="pw" type="password" placeholder="비밀번호"><div class="err" id="er"></div><button class="primary" id="lg" style="width:100%;margin-top:6px">로그인</button><p class="note">Firebase 콘솔 > Authentication에서 만든 운영자 계정으로 로그인하세요.</p></div>`;
       $('#lg').onclick=()=>AU.signInWithEmailAndPassword(auth,$('#em').value,$('#pw').value).catch(e=>$('#er').textContent='로그인 실패: '+e.code); return; }
