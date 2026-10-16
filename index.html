@@ -349,6 +349,7 @@ function uid(){ return (crypto.randomUUID?crypto.randomUUID():Date.now().toStrin
 function hhmm(t){ const d=new Date(t); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 
 /* ---------- Firebase (선택) ---------- */
+const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,rj)=>setTimeout(()=>rj(new Error('timeout')),ms))]);
 let db=null, FS=null, fbReady=null;
 async function initFB(){
   if(!CONFIG.firebase) return;
@@ -356,8 +357,27 @@ async function initFB(){
     const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     FS=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
     db=FS.getFirestore(A.initializeApp(CONFIG.firebase));
-    if(S.id) sync({});
+    await checkEpoch();
+    document.addEventListener('visibilitychange',()=>{ if(!document.hidden) checkEpoch(); });
   }catch(e){ console.warn('firebase off',e); }
+}
+/* 관리자 '기록 전체 초기화' 감지: 서버의 초기화 차수(epoch)와 다르면 이 폰의 기록을 지움 */
+let EPOCH=null;
+async function checkEpoch(){
+  if(!db) return;
+  try{
+    const d=await withTimeout(FS.getDoc(FS.doc(db,'meta','epoch')),8000);
+    EPOCH=d.exists()?(d.data().v||0):0;
+    if(S.id){
+      if(S.epoch==='pending'){ S.epoch=EPOCH; save(); }
+      else if((S.epoch??0)!==EPOCH){ // 초기화 이전 기록 → 삭제
+        try{ localStorage.removeItem(KEY); }catch(e){}
+        S=load(); S.mute=false; document.querySelectorAll('.scrim,.bigstamp').forEach(e=>e.remove());
+        renderIntro(); scrollTo(0,0); toast('새 행사 기록으로 초기화됐어요. 닉네임부터 다시 시작해 줘!'); return;
+      }
+      sync({});
+    }
+  }catch(e){ console.warn('epoch check',e); if(S.id) sync({}); }
 }
 function sync(extra){
   if(!db||!S.id) return;
@@ -367,7 +387,6 @@ function sync(extra){
 
 /* ---------- 럭키드로우 순번 발급 (교환권 받은 순서) ---------- */
 const fmtNo=n=>String(n).padStart(3,'0');
-const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,rj)=>setTimeout(()=>rj(new Error('timeout')),ms))]);
 let issuing=null;
 function issueVoucher(){
   if(S.voucher&&S.voucher.no) return Promise.resolve(S.voucher);
@@ -496,7 +515,7 @@ function renderIntro(){
   bindTop();
   const go=()=>{ const v=$('#nick').value.trim().replace(/\s+/g,' ');
     if(!v){ $('#nick').classList.remove('shake'); void $('#nick').offsetWidth; $('#nick').classList.add('shake'); sfx.no(); return; }
-    sfx.ok(); S.id=uid(); S.nick=v; S.startedAt=Date.now(); save(); sync({createdAt:S.startedAt}); confetti(80,.5,.35,.8); renderHome(); scrollTo(0,0); };
+    sfx.ok(); S.id=uid(); S.nick=v; S.startedAt=Date.now(); S.epoch=(EPOCH===null?'pending':EPOCH); save(); sync({createdAt:S.startedAt}); confetti(80,.5,.35,.8); renderHome(); scrollTo(0,0); };
   $('#start').onclick=go; $('#nick').onkeydown=e=>{ if(e.key==='Enter') go(); };
 }
 
